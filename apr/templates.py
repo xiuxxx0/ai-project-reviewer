@@ -3,7 +3,7 @@
 APR_YAML_TEMPLATE = '''# AI Project Reviewer 配置 —— 由 apr init 生成
 llm:
   provider: deepseek            # deepseek | openai | openai-compatible | ollama | mock
-  model: deepseek-chat
+  model: deepseek-v4-pro        # 或 deepseek-v4-flash（更便宜）
   base_url: https://api.deepseek.com   # openai-compatible 时必填（需含 /v1）
   api_key_env: DEEPSEEK_API_KEY        # API Key 所在的环境变量名
   temperature: 0.3

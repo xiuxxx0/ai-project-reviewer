@@ -9,7 +9,7 @@ class ConfigTest(unittest.TestCase):
     def test_defaults(self):
         cfg = Config()
         self.assertEqual(cfg.llm.provider, "deepseek")
-        self.assertEqual(cfg.llm.model, "deepseek-chat")
+        self.assertEqual(cfg.llm.model, "deepseek-v4-pro")
         self.assertEqual(cfg.output.language, "zh")
         self.assertEqual(cfg.output.file, "README复盘.md")
 
@@ -51,7 +51,7 @@ class ConfigTest(unittest.TestCase):
     def test_yaml_parser_nested_sections(self):
         from apr._yaml import parse_simple_yaml
         data = parse_simple_yaml(
-            "llm:\n  provider: deepseek\n  model: deepseek-chat\n"
+            "llm:\n  provider: deepseek\n  model: deepseek-v4-pro\n"
             "output:\n  language: zh\n")
         self.assertEqual(data["llm"]["provider"], "deepseek")
         self.assertEqual(data["output"]["language"], "zh")

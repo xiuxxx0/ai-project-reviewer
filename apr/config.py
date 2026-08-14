@@ -15,7 +15,8 @@ from ._yaml import parse_simple_yaml
 from .errors import ConfigError
 
 PROVIDER_DEFAULTS = {
-    "deepseek": {"base_url": "https://api.deepseek.com", "api_key_env": "DEEPSEEK_API_KEY", "model": "deepseek-chat"},
+    "deepseek": {"base_url": "https://api.deepseek.com", "api_key_env": "DEEPSEEK_API_KEY", "model": "deepseek-v4-pro"},
+    # deepseek-v4-flash 为更便宜的备选；旧模型名 deepseek-chat / deepseek-reasoner 已于 2026-07-24 停用
     "openai": {"base_url": "https://api.openai.com/v1", "api_key_env": "OPENAI_API_KEY", "model": "gpt-4o-mini"},
     "openai-compatible": {"base_url": "", "api_key_env": "APR_API_KEY", "model": ""},
     "ollama": {"base_url": "http://localhost:11434", "api_key_env": "", "model": "qwen2.5:7b"},
@@ -30,7 +31,7 @@ def _get(mapping: Any, key: str, default: Any = None) -> Any:
 @dataclass
 class LLMConfig:
     provider: str = "deepseek"
-    model: str = "deepseek-chat"
+    model: str = "deepseek-v4-pro"
     base_url: str = "https://api.deepseek.com"
     api_key_env: str = "DEEPSEEK_API_KEY"
     api_key: str = ""
