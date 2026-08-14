@@ -1,0 +1,4 @@
+会话记录（手动导入示例）
+用户：请帮我把问候逻辑抽到 utils.py，写一个 greet 函数。
+Claude：好的，我修改 utils.py，新增 greet 函数并让 main.py 调用它。
+用户：main.py 的入口我自己来写。

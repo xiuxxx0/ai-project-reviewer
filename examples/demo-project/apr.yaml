@@ -1,0 +1,4 @@
+llm:
+  provider: mock
+quiz:
+  enabled: false
