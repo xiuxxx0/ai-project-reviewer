@@ -103,3 +103,34 @@ def parse_simple_yaml(text: str) -> dict:
                 cur[key] = _scalar(val.strip("\"'"))
                 last_key = key
     return root
+
+
+def _dump_scalar(value) -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    return str(value)
+
+
+def dump_simple_yaml(data: dict, _indent: int = 0) -> str:
+    """把嵌套 dict/list 序列化为本解析器可读回的 YAML（注释不会被保留）。"""
+    lines: list[str] = []
+    pad = "  " * _indent
+    for key, value in data.items():
+        k = str(key)
+        if isinstance(value, dict):
+            if not value:
+                lines.append(f"{pad}{k}: {{}}")
+            else:
+                lines.append(f"{pad}{k}:")
+                lines.append(dump_simple_yaml(value, _indent + 1))
+        elif isinstance(value, list):
+            lines.append(f"{pad}{k}:")
+            for item in value:
+                lines.append(f"{pad}  - {_dump_scalar(item)}")
+        else:
+            lines.append(f"{pad}{k}: {_dump_scalar(value)}")
+    return "\n".join(lines)

@@ -68,6 +68,19 @@ def build_parser() -> argparse.ArgumentParser:
     p_init.add_argument("project", nargs="?", default=".")
     p_init.add_argument("--force", action="store_true", help="覆盖已存在的文件")
 
+    from .configure import PRESETS
+    p_config = sub.add_parser("config", help="查看或切换 LLM 配置（默认交互向导）")
+    p_config.add_argument("action", nargs="?", choices=["show", "set"],
+                          help="show=查看当前配置；set=按参数修改；留空进入交互向导")
+    p_config.add_argument("--preset", choices=list(PRESETS.keys()),
+                          help="预设：deepseek-pro / deepseek-flash / openai-mini / ollama-qwen")
+    p_config.add_argument("--provider", help="供应商（deepseek/openai/openai-compatible/ollama/mock）")
+    p_config.add_argument("--model", help="模型名")
+    p_config.add_argument("--base-url", help="API 地址")
+    p_config.add_argument("--api-key-env", help="API Key 环境变量名")
+    p_config.add_argument("--local", action="store_true",
+                          help="写入当前项目 apr.yaml（默认写入全局 ~/.apr/apr.yaml）")
+
     p_web = sub.add_parser("web", help="启动 Web 界面（零依赖，默认 http://127.0.0.1:8765）")
     p_web.add_argument("--host", default="127.0.0.1", help="监听地址")
     p_web.add_argument("--port", type=int, default=8765, help="监听端口")
@@ -174,6 +187,11 @@ def cmd_web(args) -> int:
     return 0
 
 
+def cmd_config(args) -> int:
+    from .configure import cmd_config as _run
+    return _run(args)
+
+
 def cmd_init(args) -> int:
     project = Path(args.project or ".").resolve()
     project.mkdir(parents=True, exist_ok=True)
@@ -202,6 +220,8 @@ def main(argv=None) -> int:
             return cmd_init(args)
         if args.command == "web":
             return cmd_web(args)
+        if args.command == "config":
+            return cmd_config(args)
         project = Path(args.project or ".").resolve()
         if not project.is_dir():
             print(f"✖ 路径不是目录：{project}", file=sys.stderr)

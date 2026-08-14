@@ -92,6 +92,10 @@
     apr quiz <项目路径>          # 只运行实践验证问答
     apr init <项目路径>          # 生成 apr.yaml 与 profile.yaml 模板
     apr web                      # 启动 Web 界面（http://127.0.0.1:8765）
+    apr config                   # 交互向导：切换 LLM 供应商/模型
+    apr config show              # 查看当前生效配置
+    apr config set --preset deepseek-flash   # 一键切换预设（写全局）
+    apr config set --preset deepseek-flash --local   # 只写当前项目
 
 常用参数：--provider mock（离线演示）、--skip-quiz、--no-cache、--output 路径、
 --language en、--dry-run、-v。
@@ -104,6 +108,18 @@
 实时进度日志 → 报告预览与下载。Web 端默认跳过交互问答（答题升级为学习评估系统
 属 Phase 4）。
 
+## 切换模型（apr config）
+
+    apr config set --preset deepseek-pro     # DeepSeek V4 Pro（默认）
+    apr config set --preset deepseek-flash   # DeepSeek V4 Flash（更便宜）
+    apr config set --preset openai-mini      # OpenAI GPT-4o-mini
+    apr config set --preset ollama-qwen      # 本地 Ollama
+    apr config set --model deepseek-v4-flash # 只改模型，其余不变
+    apr config                               # 交互式向导
+
+默认写入全局 ~/.apr/apr.yaml（所有项目生效）；加 --local 只写当前项目 apr.yaml。
+配置优先级：命令行参数 > 环境变量 > 项目 apr.yaml > 全局 ~/.apr/apr.yaml > 内置默认。
+
 ## 配置
 
 项目根目录 apr.yaml（可用 apr init 生成），环境变量可覆盖：
@@ -114,7 +130,7 @@ APR_PROVIDER、APR_MODEL、APR_BASE_URL、APR_API_KEY。
 - [x] Phase 1：核心引擎（扫描 / 证据 / 画像 / 8 板块 / CLI）
 - [x] Phase 2：大项目保护、缓存、多源证据融合、实践验证
 - [x] Phase 3：Web 界面（零依赖 http.server：项目预览、后台任务、进度轮询、报告预览/下载）
-- [ ] Phase 4：打包发布、更多 Agent 适配器（Cursor 原生索引等）
+- [ ] Phase 4：打包发布、Web 端答题学习评估系统、更多 Agent 适配器（Cursor 原生索引等）
 
 ## 免责声明
 
