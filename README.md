@@ -91,9 +91,18 @@
     apr scan <项目路径>          # 只扫描并预览技术栈，不调用 LLM
     apr quiz <项目路径>          # 只运行实践验证问答
     apr init <项目路径>          # 生成 apr.yaml 与 profile.yaml 模板
+    apr web                      # 启动 Web 界面（http://127.0.0.1:8765）
 
 常用参数：--provider mock（离线演示）、--skip-quiz、--no-cache、--output 路径、
 --language en、--dry-run、-v。
+
+### Web 界面
+
+    apr web --port 8765 --open
+
+零第三方依赖（stdlib http.server），功能：输入项目路径 → 项目预览 → 一键复盘 →
+实时进度日志 → 报告预览与下载。Web 端默认跳过交互问答（答题升级为学习评估系统
+属 Phase 4）。
 
 ## 配置
 
@@ -104,7 +113,7 @@ APR_PROVIDER、APR_MODEL、APR_BASE_URL、APR_API_KEY。
 
 - [x] Phase 1：核心引擎（扫描 / 证据 / 画像 / 8 板块 / CLI）
 - [x] Phase 2：大项目保护、缓存、多源证据融合、实践验证
-- [ ] Phase 3：Web 界面（FastAPI + 网页：进度展示、Markdown 预览、答题升级为学习评估系统）
+- [x] Phase 3：Web 界面（零依赖 http.server：项目预览、后台任务、进度轮询、报告预览/下载）
 - [ ] Phase 4：打包发布、更多 Agent 适配器（Cursor 原生索引等）
 
 ## 免责声明

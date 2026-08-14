@@ -43,25 +43,28 @@ class Progress:
         self.verbose = verbose
         self.quiet = quiet
 
-    def step(self, msg: str):
+    def _print(self, text: str):
         if not self.quiet:
-            print(f"\n▸ {msg}")
+            print(text)
+
+    def step(self, msg: str):
+        self._print(f"\n▸ {msg}")
 
     def info(self, msg: str):
         if self.verbose and not self.quiet:
-            print(f"   · {msg}")
+            self._print(f"   · {msg}")
 
     def warn(self, msg: str):
         if not self.quiet:
-            print(f"   ⚠ {msg}")
+            self._print(f"   ⚠ {msg}")
 
     def ok(self, msg: str):
         if not self.quiet:
-            print(f"   ✔ {msg}")
+            self._print(f"   ✔ {msg}")
 
     def section(self, index: int, total: int, name: str):
         if not self.quiet:
-            print(f"\n   [{index}/{total}] 生成「{name}」…")
+            self._print(f"\n   [{index}/{total}] 生成「{name}」…")
 
 
 def _hash_of(messages: list) -> str:

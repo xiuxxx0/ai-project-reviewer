@@ -67,6 +67,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_init = sub.add_parser("init", help="在项目根目录生成 apr.yaml 与 profile.yaml 模板")
     p_init.add_argument("project", nargs="?", default=".")
     p_init.add_argument("--force", action="store_true", help="覆盖已存在的文件")
+
+    p_web = sub.add_parser("web", help="启动 Web 界面（零依赖，默认 http://127.0.0.1:8765）")
+    p_web.add_argument("--host", default="127.0.0.1", help="监听地址")
+    p_web.add_argument("--port", type=int, default=8765, help="监听端口")
+    p_web.add_argument("--open", action="store_true", help="启动后自动打开浏览器")
+    p_web.add_argument("--config", help="指定 apr.yaml 配置文件路径")
+    _add_llm_options(p_web)
     return parser
 
 
@@ -153,6 +160,20 @@ def cmd_quiz(project: Path, cfg: Config, args) -> int:
     return 0
 
 
+def cmd_web(args) -> int:
+    from .web import run_web
+    overrides = {}
+    for key in ("provider", "model", "base_url", "api_key"):
+        value = getattr(args, key, None)
+        if value:
+            overrides[key] = value
+    print(BANNER)
+    run_web(host=args.host, port=args.port,
+            config_path=Path(args.config) if getattr(args, "config", None) else None,
+            open_browser=args.open, llm_overrides=overrides)
+    return 0
+
+
 def cmd_init(args) -> int:
     project = Path(args.project or ".").resolve()
     project.mkdir(parents=True, exist_ok=True)
@@ -179,6 +200,8 @@ def main(argv=None) -> int:
     try:
         if args.command == "init":
             return cmd_init(args)
+        if args.command == "web":
+            return cmd_web(args)
         project = Path(args.project or ".").resolve()
         if not project.is_dir():
             print(f"✖ 路径不是目录：{project}", file=sys.stderr)
