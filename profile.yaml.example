@@ -1,0 +1,8 @@
+# 个人技能档案 —— 用于「我的学习盲区」板块
+name: 你的名字            # 可选
+background: 一句话介绍你的技术背景   # 可选
+known_skills:             # 已掌握的技术/领域
+  - Python
+  - Git
+learning_goals:           # 想提升的方向
+  - 系统设计
