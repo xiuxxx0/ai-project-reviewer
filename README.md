@@ -132,6 +132,12 @@ APR_PROVIDER、APR_MODEL、APR_BASE_URL、APR_API_KEY。
 - [x] Phase 3：Web 界面（零依赖 http.server：项目预览、后台任务、进度轮询、报告预览/下载）
 - [ ] Phase 4：打包发布、Web 端答题学习评估系统、更多 Agent 适配器（Cursor 原生索引等）
 
+## 开发与同步
+
+本仓库配置了 post-commit 自动推送钩子（.githooks/post-commit，经 core.hooksPath 启用）：
+每次 git commit 成功后自动推送 GitHub。在新克隆的仓库中执行
+git config core.hooksPath .githooks 即可启用。
+
 ## 免责声明
 
 报告由 AI 自动生成，仅供学习复盘参考；标注「推测」的内容未经证据证实。

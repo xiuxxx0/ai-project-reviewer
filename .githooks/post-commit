@@ -1,0 +1,5 @@
+#!/bin/sh
+# AI Project Reviewer 自动推送钩子
+# 通过 git config core.hooksPath .githooks 启用；
+# 每次 git commit 成功后自动推送到 GitHub origin。
+git push origin HEAD 2>&1 || echo "[post-commit] 推送失败，请手动执行 git push"
