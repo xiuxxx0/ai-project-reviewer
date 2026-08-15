@@ -150,45 +150,135 @@ class KnowledgeGraph:
         return path
 
     def export_obsidian_canvas(self, path: Path) -> Path:
-        """导出 Obsidian Canvas（.canvas）：分层排布的可视化画布，直接拖入 Vault 使用。"""
-        layer_x = {"file": 0, "tech": 460, "topic": 920, "skill": 1380}
-        layer_color = {"file": "5", "tech": "4", "topic": "3", "skill": "6"}
-        canvas_nodes = []
+        """导出 Obsidian Canvas（.canvas）：严格四列分层布局。
+
+        列：文件(0) → 技术(400) → 知识点(800) → 技能(1200)；
+        统一节点尺寸、固定垂直间距、按关联关系排序（barycenter）最小化连线交叉；
+        只保留有真实关联的节点，边不显示重复 label。
+        """
+        # 1) 从数据模型收集真实关系（数据模型不变）
+        uses = []          # file -> tech
+        covers = []        # tech -> topic
+        assessed = []      # tech -> skill
+        for rel in self.relations:
+            src, dst = self.nodes.get(rel.source), self.nodes.get(rel.target)
+            if src is None or dst is None:
+                continue
+            if rel.kind == "uses" and src.kind == "file" and dst.kind == "tech":
+                uses.append((rel.source, rel.target))
+            elif rel.kind == "covers" and src.kind == "tech" and dst.kind == "topic":
+                covers.append((rel.source, rel.target))
+            elif rel.kind == "assessed" and src.kind == "tech" and dst.kind == "skill":
+                assessed.append((rel.source, rel.target))
+        uses = sorted(set(uses))
+        covers = sorted(set(covers))
+        assessed = sorted(set(assessed))
+
+        # 2) 数量限制与过滤（无关联节点一律不显示）
+        file_count = {}
+        for f, _ in uses:
+            file_count[f] = file_count.get(f, 0) + 1
+        files = sorted(file_count, key=lambda f: (-file_count[f], f))[:MAX_FILES]
+        file_set = set(files)
+
+        tech_count = {}
+        for f, t in uses:
+            if f in file_set:
+                tech_count[t] = tech_count.get(t, 0) + 1
+        techs = sorted(tech_count, key=lambda t: (-tech_count[t], t))[:MAX_TECHS]
+        tech_set = set(techs)
+
+        kept_topics: list[tuple[str, str]] = []
+        seen_topics: set[str] = set()
+        per_tech: dict[str, int] = {}
+        for tech, topic in covers:  # 按模型顺序：默认知识点在前、档案主题在后
+            if tech not in tech_set or topic in seen_topics:
+                continue
+            if per_tech.get(tech, 0) >= MAX_TOPICS_PER_TECH:
+                continue
+            seen_topics.add(topic)
+            per_tech[tech] = per_tech.get(tech, 0) + 1
+            kept_topics.append((tech, topic))
+        topic_set = {t for _, t in kept_topics}
+        tech_topics: dict[str, list[str]] = {}
+        for tech, topic in kept_topics:
+            tech_topics.setdefault(tech, []).append(topic)
+
+        # 技能：只保留与展示技术有 assessed 关系、且经知识点承接的
+        tech_skills: dict[str, list[str]] = {}
+        for tech, skill in assessed:
+            if tech in tech_set:
+                tech_skills.setdefault(tech, []).append(skill)
+        assesses: list[tuple[str, str]] = []
+        for tech, skill_list in tech_skills.items():
+            for topic in tech_topics.get(tech, []):
+                for skill in sorted(set(skill_list)):
+                    assesses.append((topic, skill))
+        assesses = sorted(set(assesses))
+        skill_set = {s for _, s in assesses}
+        skills = sorted(skill_set)
+
+        # 排序只使用已过滤的相邻列关系（超限节点不得回流）
+        uses_limited = [(f, t) for f, t in uses if f in file_set and t in tech_set]
+
+        # 3) 排序：多种初始顺序 + barycenter，取连线交叉最少的一种
+        best = None
+        for variant in range(3):
+            order = _order_canvas_layers(files, techs, kept_topics, skills,
+                                         uses_limited, assesses, variant)
+            crossings = _canvas_crossings(order, uses_limited, kept_topics, assesses)
+            if best is None or crossings < best[0]:
+                best = (crossings, order)
+        crossings, (files_o, techs_o, topics_o, skills_o) = best
+
+        # 4) 布局：固定 X、自动 Y（统一尺寸 + 固定间距，天然无重叠）
         id_map: dict[str, str] = {}
-        for i, node in enumerate(sorted(self.nodes.values(), key=lambda n: n.id)):
-            id_map[node.id] = "n" + str(i + 1)
-        y_cursor = {k: 40 for k in layer_x}
-        for node in sorted(self.nodes.values(), key=lambda n: (n.kind, n.id)):
-            if node.kind == "skill":
-                mastery = node.properties.get("mastery_percent")
-                text = "**" + node.name + "**\n掌握程度 " + (str(mastery) + "%" if mastery is not None else "未评估")
-            elif node.kind == "tech":
-                text = "**" + node.name + "**"
-                if node.properties.get("file_count"):
-                    text += "\n文件数 " + str(node.properties["file_count"])
-            else:
-                text = node.name
-            lines = text.count("\n") + 1
-            height = 20 * lines + 26
-            x = layer_x.get(node.kind, 0)
-            y = y_cursor.get(node.kind, 40)
-            y_cursor[node.kind] = y + height + 24
-            canvas_nodes.append({
-                "id": id_map[node.id], "type": "text", "text": text,
-                "x": x, "y": y, "width": 280, "height": height,
-                "color": layer_color.get(node.kind, "1"),
-            })
+        canvas_nodes = []
+
+        canvas_nodes.append({"id": "title", "type": "text",
+                             "text": "**RepoCourse · 项目知识图谱**\n" + (self.project or ""),
+                             "x": 0, "y": 0, "width": CANVAS_WIDTH, "height": 50,
+                             "color": "5"})
+        id_map["title"] = "title"
+        headers = [("hdr-file", "代码", 0), ("hdr-tech", "技术", COL_X["tech"]),
+                   ("hdr-topic", "知识", COL_X["topic"]), ("hdr-skill", "我的技能", COL_X["skill"])]
+        for nid, text, x in headers:
+            canvas_nodes.append({"id": nid, "type": "text", "text": text,
+                                 "x": x, "y": HEADER_Y, "width": NODE_W, "height": HEADER_H,
+                                 "color": "2"})
+            id_map[nid] = nid
+
+        kind_color = {"file": "5", "tech": "4", "topic": "3", "skill": "6"}
+
+        def place(col_ids: list[str], kind: str):
+            x = COL_X[kind]
+            for i, nid in enumerate(col_ids):
+                node = self.nodes[nid]
+                text = _canvas_text(node)
+                canvas_nodes.append({
+                    "id": nid, "type": "text", "text": text,
+                    "x": x, "y": START_Y + i * (NODE_H + Y_GAP),
+                    "width": NODE_W, "height": NODE_H,
+                    "color": kind_color[kind],
+                })
+                id_map[nid] = nid
+
+        for col, kind in ((files_o, "file"), (techs_o, "tech"),
+                          (topics_o, "topic"), (skills_o, "skill")):
+            place(col, kind)
+
+        # 5) 边：只保留相邻列真实关系，不显示 label
         canvas_edges = []
-        for i, rel in enumerate(self.relations):
-            if rel.source not in id_map or rel.target not in id_map:
+        edge_i = 1
+        for src, dst in (uses_limited + kept_topics + assesses):
+            if src not in id_map or dst not in id_map:
                 continue
             canvas_edges.append({
-                "id": "e" + str(i + 1),
-                "fromNode": id_map[rel.source], "toNode": id_map[rel.target],
-                "fromSide": "right", "toSide": "left",
-                "label": rel.kind,
-                "color": "2",
+                "id": "e" + str(edge_i), "fromNode": src, "toNode": dst,
+                "fromSide": "right", "toSide": "left", "color": "2",
             })
+            edge_i += 1
+
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({"nodes": canvas_nodes, "edges": canvas_edges},
                                    ensure_ascii=False, indent=2), encoding="utf-8")
@@ -370,6 +460,83 @@ def build_knowledge_graph(profile: Profile | None = None,
                            f"置信度 {entry.confidence:.0%}）",
                     confidence=entry.confidence))
     return graph
+
+
+# Canvas 布局常量（严格四列分层）
+COL_X = {"file": 0, "tech": 400, "topic": 800, "skill": 1200}
+NODE_W, NODE_H = 260, 80
+Y_GAP = 100                    # 同列节点垂直间距（>=100px）
+START_Y = 140                  # 数据节点起始 Y（标题 0，列头 70）
+HEADER_Y, HEADER_H = 70, 40
+CANVAS_WIDTH = 1460
+MAX_FILES = 10                 # 核心文件上限
+MAX_TECHS = 15                 # 技术/框架上限
+MAX_TOPICS_PER_TECH = 5        # 每个技术核心知识点上限
+
+
+def _canvas_text(node) -> str:
+    if node.kind == "skill":
+        mastery = node.properties.get("mastery_percent")
+        suffix = (str(mastery) + "%") if mastery is not None else "未评估"
+        return "**" + node.name + "**\n掌握程度 " + suffix
+    if node.kind == "tech":
+        text = "**" + node.name + "**"
+        if node.properties.get("file_count"):
+            text += "\n文件数 " + str(node.properties["file_count"])
+        return text
+    return node.name
+
+
+def _barycenter(source_order: list[str], edges: list[tuple[str, str]]) -> list[str]:
+    """按已定序的源层平均位置给目标层排序（barycenter 启发式，减少交叉）。"""
+    pos = {s: i for i, s in enumerate(source_order)}
+    sums: dict[str, float] = {}
+    cnt: dict[str, int] = {}
+    for a, b in edges:
+        if a in pos:
+            sums[b] = sums.get(b, 0.0) + pos[a]
+            cnt[b] = cnt.get(b, 0) + 1
+    return sorted((b for b in sums), key=lambda b: (sums[b] / cnt[b], b))
+
+
+def _order_canvas_layers(files, techs, kept_topics, skills, uses, assesses, variant):
+    """多种初始顺序 + 两轮 barycenter，返回四层节点顺序。"""
+    if variant == 0:
+        files0 = sorted(files)
+    elif variant == 1:
+        cnt = {}
+        for f, _ in uses:
+            cnt[f] = cnt.get(f, 0) + 1
+        files0 = sorted(files, key=lambda f: (-cnt.get(f, 0), f))
+    else:
+        files0 = sorted(files, key=lambda f: sorted(t for a, t in uses if a == f))
+
+    techs_o = _barycenter(files0, uses)
+    topics_o = _barycenter(techs_o, kept_topics)
+    skills_o = _barycenter(topics_o, assesses)
+    files_o = _barycenter(techs_o, [(t, f) for f, t in uses])
+    techs_o = _barycenter(files_o, uses)
+    return files_o, techs_o, topics_o, skills_o
+
+
+def _canvas_crossings(order, uses, kept_topics, assesses) -> int:
+    """统计相邻列之间的连线交叉总数。"""
+    files_o, techs_o, topics_o, skills_o = order
+
+    def pair_crossings(edges, left, right):
+        lpos = {n: i for i, n in enumerate(left)}
+        rpos = {n: i for i, n in enumerate(right)}
+        pairs = sorted((lpos[a], rpos[b]) for a, b in edges if a in lpos and b in rpos)
+        total = 0
+        for i in range(len(pairs)):
+            for j in range(i + 1, len(pairs)):
+                if (pairs[i][0] - pairs[j][0]) * (pairs[i][1] - pairs[j][1]) < 0:
+                    total += 1
+        return total
+
+    return (pair_crossings(uses, files_o, techs_o)
+            + pair_crossings(kept_topics, techs_o, topics_o)
+            + pair_crossings(assesses, topics_o, skills_o))
 
 
 def _mm_safe(label: str) -> str:

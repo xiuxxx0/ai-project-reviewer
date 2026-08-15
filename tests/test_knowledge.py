@@ -151,14 +151,85 @@ class KnowledgeTest(unittest.TestCase):
         data = json.loads(out.read_text(encoding="utf-8"))
         self.assertIn("nodes", data)
         self.assertIn("edges", data)
-        self.assertGreaterEqual(len(data["nodes"]), 3)
-        techs = [n for n in data["nodes"] if n["color"] == "4"]
-        self.assertGreaterEqual(len(techs), 1)
-        labels = {e["label"] for e in data["edges"]}
-        self.assertIn("uses", labels)
-        self.assertIn("assessed", labels)
-        skills = [n for n in data["nodes"] if "掌握程度" in n["text"]]
+        # 标题与列头
+        texts = [n["text"] for n in data["nodes"]]
+        self.assertTrue(any("RepoCourse · 项目知识图谱" in t for t in texts))
+        for header in ("代码", "技术", "知识", "我的技能"):
+            self.assertTrue(any(t == header for t in texts))
+        # 统一尺寸（数据节点）
+        data_nodes = [n for n in data["nodes"]
+                      if n["id"] not in ("title", "hdr-file", "hdr-tech", "hdr-topic", "hdr-skill")]
+        for n in data_nodes:
+            self.assertEqual(n["width"], 260)
+            self.assertEqual(n["height"], 80)
+        # 固定 X 四列
+        xs = {n["x"] for n in data_nodes}
+        self.assertEqual(xs, {0, 400, 800, 1200})
+        # 同列无重叠：固定 180 步进（80 高 + 100 间距）
+        for x in (0, 400, 800, 1200):
+            ys = sorted(n["y"] for n in data_nodes if n["x"] == x)
+            for a, b in zip(ys, ys[1:]):
+                self.assertGreaterEqual(b - a, 180)
+        # 边不显示 label
+        self.assertFalse(any("label" in e for e in data["edges"]))
+        # 无孤立节点（除标题/列头）
+        referenced = set()
+        for e in data["edges"]:
+            referenced.add(e["fromNode"])
+            referenced.add(e["toNode"])
+        for n in data_nodes:
+            self.assertIn(n["id"], referenced)
+        # 无重复节点 id
+        ids = [n["id"] for n in data["nodes"]]
+        self.assertEqual(len(ids), len(set(ids)))
+        # 技术节点保留，技能节点含掌握程度
+        self.assertGreaterEqual(len([n for n in data_nodes if n["color"] == "4"]), 1)
+        skills = [n for n in data_nodes if "掌握程度" in n["text"]]
         self.assertGreaterEqual(len(skills), 1)
+
+    def test_canvas_limits(self):
+        root = fixture_dir("knowledge")
+        for i in range(12):
+            (root / ("f%02d.py" % i)).write_text(
+                "from x import RedisTemplate\n", encoding="utf-8")
+        scan = _scan(root)
+        profile = Profile(learning=[SkillClaim(
+            "Redis", "beginner", ["t1", "t2", "t3", "t4", "t5", "t6"])])
+        graph = build_knowledge_graph(profile=profile, scan=scan,
+                                      digest=_digest(root, scan),
+                                      skill_assessment=_assessment())
+        out = graph.export_obsidian_canvas(root / "knowledge_graph.canvas")
+        data = json.loads(out.read_text(encoding="utf-8"))
+        data_nodes = [n for n in data["nodes"]
+                      if n["id"] not in ("title", "hdr-file", "hdr-tech", "hdr-topic", "hdr-skill")]
+        self.assertLessEqual(len([n for n in data_nodes if n["x"] == 0]), 10)      # 文件 ≤10
+        self.assertLessEqual(len([n for n in data_nodes if n["x"] == 400]), 15)    # 技术 ≤15
+        self.assertLessEqual(len([n for n in data_nodes if n["x"] == 800]), 5)     # 每技术知识点 ≤5
+
+    def test_canvas_barycenter_no_crossings(self):
+        from apr.knowledge.knowledge import _canvas_crossings
+        root = fixture_dir("knowledge")
+        (root / "A.java").write_text("@Service\npublic class A {}\n", encoding="utf-8")   # → Spring
+        (root / "B.py").write_text("from x import RedisTemplate\n", encoding="utf-8")      # → Redis
+        scan = _scan(root)
+        graph = build_knowledge_graph(scan=scan, digest=_digest(root, scan),
+                                      skill_assessment=_assessment())
+        out = graph.export_obsidian_canvas(root / "knowledge_graph.canvas")
+        data = json.loads(out.read_text(encoding="utf-8"))
+        data_nodes = [n for n in data["nodes"]
+                      if n["id"] not in ("title", "hdr-file", "hdr-tech", "hdr-topic", "hdr-skill")]
+        col = {0: [], 400: [], 800: [], 1200: []}
+        for n in sorted(data_nodes, key=lambda n: n["y"]):
+            col[n["x"]].append(n["id"])
+        uses = [(e["fromNode"], e["toNode"]) for e in data["edges"]
+                if e["fromNode"] in col[0] and e["toNode"] in col[400]]
+        covers = [(e["fromNode"], e["toNode"]) for e in data["edges"]
+                  if e["fromNode"] in col[400] and e["toNode"] in col[800]]
+        assesses = [(e["fromNode"], e["toNode"]) for e in data["edges"]
+                    if e["fromNode"] in col[800] and e["toNode"] in col[1200]]
+        crossings = _canvas_crossings((col[0], col[400], col[800], col[1200]),
+                                      uses, covers, assesses)
+        self.assertEqual(crossings, 0)
 
     def test_export_obsidian_mindmap(self):
         root = fixture_dir("knowledge")
