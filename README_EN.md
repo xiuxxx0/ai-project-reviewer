@@ -201,11 +201,11 @@ apr scan .       # tech stack preview only (no LLM)
 apr graph .      # knowledge graph (json/html/canvas/mindmap/skill-tree)
 apr plan .       # learning plan (no LLM) → learning_plan.json
 apr quiz .       # AI-generated quiz + grading
-apr web          # web UI at http://127.0.0.1:8765
+apr web          # web UI at http://127.0.0.1:8765 (review + quiz challenge)
 apr config       # switch LLM providers interactively
 ```
 
-Web UI:
+Web UI (project review + beginner-friendly quiz challenge with instant grading):
 
 ![Web UI](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/web-ui.png)
 
@@ -263,6 +263,7 @@ flowchart LR
 | AI Collaboration Analysis | ✅ Done |
 | Skill Assessment | ✅ Done |
 | Quiz Verification | ✅ Done |
+| Web Quiz Challenge | ✅ Done |
 | Knowledge Graph | ✅ Done |
 | Learning Feedback | 🚧 Improving |
 | Web Dashboard | 📌 Planned |

@@ -216,7 +216,7 @@ apr review .          # 或加 --skip-quiz 跳过答题
 apr graph .           # 知识图谱：网页图 + Obsidian 画布 + 学习技能树
 apr plan .            # 个性化学习计划（短期/中期任务）
 apr quiz .            # AI 出题考你
-apr web               # 网页操作界面
+apr web               # 网页操作界面（含答题挑战）
 ```
 
 ### 常见问题
@@ -424,6 +424,7 @@ flowchart LR
 | AI 协作分析 | ✅ 已完成 |
 | 技能评估 | ✅ 已完成 |
 | Quiz 验证 | ✅ 已完成 |
+| 网页答题挑战 | ✅ 已完成 |
 | Knowledge Graph | ✅ 已完成 |
 | 学习反馈 | 🚧 持续优化 |
 | Web Dashboard | 📌 计划中 |
