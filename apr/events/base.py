@@ -1,20 +1,22 @@
 """统一 Agent Event 系统：规范事件模型与 Adapter 抽象。
 
 把不同 Agent 的日志统一转换为 AgentEvent：
-- timestamp: 时间戳（原样字符串，可为空）
+- timestamp: 时间戳（ISO 字符串，可为空）
 - source:    来源标识（dsh / generic / ...）
 - actor:     行为主体（user / assistant / tool / system / unknown）
 - event_type: 事件类型（message / edit / write / tool_call / tool_result / record ...）
 - file:      涉及文件（归一化相对路径，可为空）
 - content:   文本内容（消息正文 / 工具摘要 / 记录原文，长度受限）
 
+Adapter.parse 返回事件列表：一行日志可以产出多个事件（例如
+assistant/message 中同时包含多个 tool-call 与文本）。
 本模块独立于 evidence 层：不修改、不复用 evidence/agent_logs.py。
 """
 from __future__ import annotations
 
 import json
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Iterable
 
 MAX_CONTENT = 2000
@@ -41,25 +43,25 @@ class AgentEvent:
 
 
 class Adapter(ABC):
-    """日志适配器：把一行 JSON 原始对象转换为 AgentEvent（不匹配返回 None）。"""
+    """日志适配器：把一行 JSON 原始对象转换为事件列表（无匹配返回空列表）。"""
 
     name: str = "base"
 
     @abstractmethod
-    def parse(self, raw: dict, source: str) -> AgentEvent | None: ...
+    def parse(self, raw: dict, source: str) -> list[AgentEvent]: ...
 
-    def parse_line(self, line: str, source: str) -> AgentEvent | None:
+    def parse_line(self, line: str, source: str) -> list[AgentEvent]:
         try:
             obj = json.loads(line)
         except json.JSONDecodeError:
-            return None
+            return []
         if not isinstance(obj, dict):
-            return None
-        event = self.parse(obj, source)
-        if event is not None:
+            return []
+        events = self.parse(obj, source)
+        for event in events:
             if event.source == "":
                 event.source = source
-        return event
+        return events
 
 
 def parse_events(lines: Iterable[str], adapter: Adapter, source: str) -> list[AgentEvent]:
@@ -69,9 +71,7 @@ def parse_events(lines: Iterable[str], adapter: Adapter, source: str) -> list[Ag
         line = line.strip()
         if not line:
             continue
-        event = adapter.parse_line(line, source)
-        if event is not None:
-            events.append(event)
+        events.extend(adapter.parse_line(line, source))
     return events
 
 
