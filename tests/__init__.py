@@ -21,6 +21,7 @@ _FIXTURES = {
     "quiz": [],
     "web": [],
     "knowledge": [],
+    "dsh": [],
 }
 
 

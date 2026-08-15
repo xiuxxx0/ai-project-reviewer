@@ -1,0 +1,191 @@
+{
+  "priority": [
+    {
+      "skill": "REST API",
+      "level": "high",
+      "reason": [
+        "项目使用REST API",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习资源设计基础",
+        "实现 REST API 练习 Demo",
+        "重构项目中 REST API 相关模块"
+      ]
+    },
+    {
+      "skill": "React",
+      "level": "high",
+      "reason": [
+        "项目使用React",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习组件基础",
+        "实现 React 练习 Demo",
+        "重构项目中 React 相关模块"
+      ]
+    },
+    {
+      "skill": "Spring",
+      "level": "high",
+      "reason": [
+        "项目大量使用Spring",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习IoC/DI基础",
+        "实现 Spring 练习 Demo",
+        "重构项目中 Spring 相关模块"
+      ]
+    },
+    {
+      "skill": "MySQL",
+      "level": "medium",
+      "reason": [
+        "项目使用MySQL",
+        "正在学习中"
+      ],
+      "action": [
+        "学习表设计基础",
+        "实现 MySQL 练习 Demo",
+        "重构项目中 MySQL 相关模块"
+      ]
+    },
+    {
+      "skill": "Django",
+      "level": "medium",
+      "reason": [
+        "项目使用Django",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习MTV 架构基础",
+        "实现 Django 练习 Demo",
+        "在项目中扩展 Django 的应用"
+      ]
+    },
+    {
+      "skill": "Elasticsearch",
+      "level": "medium",
+      "reason": [
+        "项目使用Elasticsearch",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习倒排索引基础",
+        "实现 Elasticsearch 练习 Demo",
+        "在项目中扩展 Elasticsearch 的应用"
+      ]
+    },
+    {
+      "skill": "FastAPI",
+      "level": "medium",
+      "reason": [
+        "项目使用FastAPI",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习路由基础",
+        "实现 FastAPI 练习 Demo",
+        "在项目中扩展 FastAPI 的应用"
+      ]
+    },
+    {
+      "skill": "JWT",
+      "level": "medium",
+      "reason": [
+        "项目使用JWT",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习令牌结构基础",
+        "实现 JWT 练习 Demo",
+        "在项目中扩展 JWT 的应用"
+      ]
+    },
+    {
+      "skill": "Kafka",
+      "level": "medium",
+      "reason": [
+        "项目使用Kafka",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习生产者/消费者基础",
+        "实现 Kafka 练习 Demo",
+        "在项目中扩展 Kafka 的应用"
+      ]
+    },
+    {
+      "skill": "MongoDB",
+      "level": "medium",
+      "reason": [
+        "项目使用MongoDB",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习文档模型基础",
+        "实现 MongoDB 练习 Demo",
+        "在项目中扩展 MongoDB 的应用"
+      ]
+    },
+    {
+      "skill": "MyBatis",
+      "level": "medium",
+      "reason": [
+        "项目使用MyBatis",
+        "技能档案尚未掌握"
+      ],
+      "action": [
+        "学习SQL 映射基础",
+        "实现 MyBatis 练习 Demo",
+        "在项目中扩展 MyBatis 的应用"
+      ]
+    },
+    {
+      "skill": "Redis",
+      "level": "medium",
+      "reason": [
+        "项目大量使用Redis",
+        "学习目标（优先级medium）"
+      ],
+      "action": [
+        "学习缓存基础",
+        "实现 Redis 练习 Demo",
+        "重构项目中 Redis 相关模块"
+      ]
+    },
+    {
+      "skill": "Python",
+      "level": "medium",
+      "reason": [
+        "项目大量使用Python"
+      ],
+      "action": [
+        "学习 Python 基础",
+        "实现 Python 练习 Demo",
+        "重构项目中 Python 相关模块"
+      ]
+    },
+    {
+      "skill": "Spring Boot",
+      "level": "medium",
+      "reason": [
+        "项目使用Spring Boot",
+        "正在学习中"
+      ],
+      "action": [
+        "学习自动配置基础",
+        "实现 Spring Boot 练习 Demo",
+        "在项目中扩展 Spring Boot 的应用"
+      ]
+    }
+  ],
+  "next_projects": [
+    "REST API 实战练习",
+    "React 实战练习",
+    "Spring 实战练习",
+    "Java后端开发 Demo 项目"
+  ]
+}

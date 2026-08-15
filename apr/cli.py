@@ -74,6 +74,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_graph.add_argument("--output", help="输出路径（默认写入项目根目录 knowledge_graph.json）")
     p_graph.add_argument("--verbose", "-v", action="store_true")
 
+    p_plan = sub.add_parser("plan", help="生成个性化学习计划 learning_plan.json（Learning Coach，不调用 LLM）")
+    p_plan.add_argument("project", nargs="?", default=".")
+    p_plan.add_argument("--config", help="指定 apr.yaml 配置文件路径")
+    p_plan.add_argument("--output", help="输出路径（默认写入项目根目录 learning_plan.json）")
+    p_plan.add_argument("--verbose", "-v", action="store_true")
+
     from .configure import PRESETS
     p_config = sub.add_parser("config", help="查看或切换 LLM 配置（默认交互向导）")
     p_config.add_argument("action", nargs="?", choices=["show", "set"],
@@ -233,6 +239,42 @@ def cmd_graph(project: Path, cfg: Config, args) -> int:
     return 0
 
 
+def cmd_plan(project: Path, cfg: Config, args) -> int:
+    import json
+    from .assessment.blindspot import detect_blind_spots
+    from .assessment.skill import assess_skills
+    from .coach.planner import build_learning_plan
+    from .evidence.agent_logs import collect_agent_evidence
+    from .evidence.fusion import fuse
+    from .evidence.git import collect_git_evidence
+    from .evidence.markers import scan_markers
+    from .profile import load_profile
+    print(BANNER)
+    scan = scan_project(project, cfg.limits)
+    digest = build_digest(project, scan, cfg.limits)
+    items = scan_markers(scan)
+    git_items, git_notes, _ = collect_git_evidence(project)
+    items.extend(git_items)
+    agent_items, _, agent_notes = collect_agent_evidence(project, scan, cfg.evidence)
+    items.extend(agent_items)
+    evidence = fuse(items, scan.rel_set(), git_notes + agent_notes, [])
+    profile = load_profile(project / cfg.profile)
+    assessment = assess_skills(profile=profile, scan=scan, quiz=None, evidence=evidence)
+    blind_spots = detect_blind_spots(profile=profile, scan=scan, digest=digest,
+                                     quiz=None, evidence=evidence)
+    plan = build_learning_plan(profile=profile, scan=scan, digest=digest,
+                               quiz=None, evidence=evidence,
+                               assessment=assessment, blind_spots=blind_spots)
+    out = Path(args.output) if getattr(args, "output", None) else project / "learning_plan.json"
+    if not out.is_absolute():
+        out = project / out
+    out.write_text(json.dumps(plan.to_dict(), ensure_ascii=False, indent=2),
+                   encoding="utf-8")
+    print(plan.render_markdown())
+    print(f"✔ 学习计划已保存：{out}")
+    return 0
+
+
 def cmd_init(args) -> int:
     project = Path(args.project or ".").resolve()
     project.mkdir(parents=True, exist_ok=True)
@@ -275,6 +317,8 @@ def main(argv=None) -> int:
             return cmd_scan(project, cfg, args)
         if args.command == "graph":
             return cmd_graph(project, cfg, args)
+        if args.command == "plan":
+            return cmd_plan(project, cfg, args)
         if args.command == "quiz":
             return cmd_quiz(project, cfg, args)
     except AprError as e:

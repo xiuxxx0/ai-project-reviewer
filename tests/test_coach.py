@@ -127,6 +127,17 @@ class CoachTest(unittest.TestCase):
         self.assertIn("priority", data)
         self.assertIn("next_projects", data)
 
+    def test_cli_plan_command(self):
+        from apr.cli import main
+        root, scan, digest = _project()
+        rc = main(["plan", str(root)])
+        self.assertEqual(rc, 0)
+        out = root / "learning_plan.json"
+        self.assertTrue(out.is_file())
+        data = json.loads(out.read_text(encoding="utf-8"))
+        self.assertIn("priority", data)
+        self.assertIn("next_projects", data)
+
     def test_dataclasses(self):
         item = PriorityItem(skill="Redis", level="high", reason=["r"], action=["a"])
         self.assertEqual(item.to_dict()["skill"], "Redis")

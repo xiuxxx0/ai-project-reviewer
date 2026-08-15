@@ -1,12 +1,12 @@
 {
   "version": 1,
   "project": "ai-project-reviewer",
-  "generated_at": "2026-08-15T16:52:16",
+  "generated_at": "2026-08-15T18:04:45",
   "stats": {
-    "total_nodes": 122,
-    "total_relations": 126,
-    "file": 4,
-    "tech": 26,
+    "total_nodes": 128,
+    "total_relations": 138,
+    "file": 9,
+    "tech": 27,
     "topic": 75,
     "skill": 17
   },
@@ -21,18 +21,60 @@
       "id": "file:apr/knowledge/knowledge.py",
       "kind": "file",
       "name": "apr/knowledge/knowledge.py",
-      "properties": {}
+      "properties": {
+        "ai_contribution": 0.0,
+        "ai_classification": "疑似人工"
+      }
     },
     {
       "id": "file:knowledge_graph-mindmap.md",
       "kind": "file",
       "name": "knowledge_graph-mindmap.md",
+      "properties": {
+        "ai_contribution": 0.0,
+        "ai_classification": "疑似人工"
+      }
+    },
+    {
+      "id": "file:learning_plan.json",
+      "kind": "file",
+      "name": "learning_plan.json",
+      "properties": {}
+    },
+    {
+      "id": "file:tests/test_blindspot.py",
+      "kind": "file",
+      "name": "tests/test_blindspot.py",
+      "properties": {
+        "ai_contribution": 0.0,
+        "ai_classification": "疑似人工"
+      }
+    },
+    {
+      "id": "file:tests/test_coach.py",
+      "kind": "file",
+      "name": "tests/test_coach.py",
+      "properties": {}
+    },
+    {
+      "id": "file:tests/test_event_bridge.py",
+      "kind": "file",
+      "name": "tests/test_event_bridge.py",
       "properties": {}
     },
     {
       "id": "file:tests/test_knowledge.py",
       "kind": "file",
       "name": "tests/test_knowledge.py",
+      "properties": {
+        "ai_contribution": 0.0,
+        "ai_classification": "疑似人工"
+      }
+    },
+    {
+      "id": "file:tests/test_report_route.py",
+      "kind": "file",
+      "name": "tests/test_report_route.py",
       "properties": {}
     },
     {
@@ -242,19 +284,25 @@
       "id": "tech:Django",
       "kind": "tech",
       "name": "Django",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Elasticsearch",
       "kind": "tech",
       "name": "Elasticsearch",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:FastAPI",
       "kind": "tech",
       "name": "FastAPI",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Git",
@@ -273,10 +321,20 @@
       }
     },
     {
+      "id": "tech:JSON",
+      "kind": "tech",
+      "name": "JSON",
+      "properties": {
+        "file_count": 1
+      }
+    },
+    {
       "id": "tech:JWT",
       "kind": "tech",
       "name": "JWT",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Java",
@@ -298,7 +356,9 @@
       "id": "tech:Kafka",
       "kind": "tech",
       "name": "Kafka",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Markdown",
@@ -312,71 +372,89 @@
       "id": "tech:MongoDB",
       "kind": "tech",
       "name": "MongoDB",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:MyBatis",
       "kind": "tech",
       "name": "MyBatis",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:MySQL",
       "kind": "tech",
       "name": "MySQL",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Python",
       "kind": "tech",
       "name": "Python",
       "properties": {
-        "file_count": 49
+        "file_count": 61
       }
     },
     {
       "id": "tech:REST API",
       "kind": "tech",
       "name": "REST API",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:React",
       "kind": "tech",
       "name": "React",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Redis",
       "kind": "tech",
       "name": "Redis",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Spring",
       "kind": "tech",
       "name": "Spring",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:Spring Boot",
       "kind": "tech",
       "name": "Spring Boot",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:TOML",
       "kind": "tech",
       "name": "TOML",
       "properties": {
-        "file_count": 1
+        "file_count": 2
       }
     },
     {
       "id": "tech:Vue",
       "kind": "tech",
       "name": "Vue",
-      "properties": {}
+      "properties": {
+        "avg_ai_contribution": 0.0
+      }
     },
     {
       "id": "tech:YAML",
@@ -985,6 +1063,20 @@
       "confidence": 1.0
     },
     {
+      "source": "file:learning_plan.json",
+      "target": "tech:MySQL",
+      "kind": "uses",
+      "detail": "检测到 MyBatis",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:learning_plan.json",
+      "target": "tech:JSON",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:MySQL",
       "kind": "uses",
@@ -993,6 +1085,13 @@
     },
     {
       "source": "file:knowledge_graph-mindmap.md",
+      "target": "tech:REST API",
+      "kind": "uses",
+      "detail": "检测到 FastAPI",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:learning_plan.json",
       "target": "tech:REST API",
       "kind": "uses",
       "detail": "检测到 FastAPI",
@@ -1034,6 +1133,48 @@
       "confidence": 0.9
     },
     {
+      "source": "file:tests/test_blindspot.py",
+      "target": "tech:Redis",
+      "kind": "uses",
+      "detail": "检测到 RedisTemplate",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:tests/test_blindspot.py",
+      "target": "tech:Python",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
+      "source": "file:tests/test_coach.py",
+      "target": "tech:Redis",
+      "kind": "uses",
+      "detail": "检测到 RedisTemplate",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:tests/test_coach.py",
+      "target": "tech:Python",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
+      "source": "file:tests/test_event_bridge.py",
+      "target": "tech:Redis",
+      "kind": "uses",
+      "detail": "检测到 RedisTemplate",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:tests/test_event_bridge.py",
+      "target": "tech:Python",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
       "source": "file:tests/test_knowledge.py",
       "target": "tech:Redis",
       "kind": "uses",
@@ -1048,10 +1189,31 @@
       "confidence": 1.0
     },
     {
+      "source": "file:tests/test_report_route.py",
+      "target": "tech:Redis",
+      "kind": "uses",
+      "detail": "检测到 RedisTemplate",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:tests/test_report_route.py",
+      "target": "tech:Python",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:Spring",
       "kind": "uses",
       "detail": "检测到 @RestController、@Controller、@Service、@Autowired、@Component",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:tests/test_blindspot.py",
+      "target": "tech:Spring",
+      "kind": "uses",
+      "detail": "检测到 @Service",
       "confidence": 0.9
     },
     {

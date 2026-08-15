@@ -38,6 +38,7 @@ mindmap
       Git 掌握16%
     HTML/CSS
       HTML/CSS 掌握16%
+    JSON
     JWT
       apr/knowledge/knowledge.py
       令牌结构
@@ -71,6 +72,7 @@ mindmap
     MySQL
       apr/knowledge/knowledge.py
       knowledge_graph-mindmap.md
+      learning_plan.json
       CRUD
       SQL 优化
       事务
@@ -87,6 +89,7 @@ mindmap
     REST API
       apr/knowledge/knowledge.py
       knowledge_graph-mindmap.md
+      learning_plan.json
       HTTP 语义
       分页
       状态码
@@ -100,7 +103,11 @@ mindmap
       虚拟 DOM
     Redis
       apr/knowledge/knowledge.py
+      tests/test_blindspot.py
+      tests/test_coach.py
+      tests/test_event_bridge.py
       tests/test_knowledge.py
+      tests/test_report_route.py
       Key 设计
       缓存
       缓存穿透/击穿/雪崩
@@ -108,6 +115,7 @@ mindmap
       Redis 掌握14%
     Spring
       apr/knowledge/knowledge.py
+      tests/test_blindspot.py
       tests/test_knowledge.py
       AOP
       Bean 生命周期

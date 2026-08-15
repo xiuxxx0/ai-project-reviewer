@@ -237,6 +237,49 @@ def collect_generic(root: Path, scan: ScanResult, base: Path, agent: str):
     return events[:300], notes
 
 
+def collect_dsh_events(root: Path, scan: ScanResult, dsh_dir: str):
+    """用统一事件系统（apr.events）解析 DSH JSONL，桥接为证据项。
+
+    事件 → 证据映射：edit/write → AI 编辑证据；tool_call → 工具调用；
+    tool_result/record → 弱提及。仅保留能匹配到项目文件的证据。
+    """
+    from ..events import load_events
+    items: list[EvidenceItem] = []
+    notes: list[str] = []
+    base = Path(dsh_dir).expanduser()
+    if not base.is_dir():
+        return items, notes
+    rel_set = scan.rel_set()
+    files = sorted([p for p in base.rglob("*.jsonl") if p.is_file()],
+                   key=lambda p: p.stat().st_mtime, reverse=True)[:50]
+    score_map = {"edit": (0.85, 0.8), "write": (0.8, 0.8), "tool_call": (0.6, 0.5),
+                 "tool_result": (0.3, 0.4), "record": (0.4, 0.45)}
+    seen: set = set()
+    total = 0
+    for path in files:
+        try:
+            events = load_events(path, source="dsh")
+        except OSError:
+            continue
+        for ev in events:
+            if not ev.file:
+                continue
+            rel = _match_any(ev.file, rel_set)
+            if not rel or (rel, ev.event_type) in seen:
+                continue
+            seen.add((rel, ev.event_type))
+            total += 1
+            score, conf = score_map.get(ev.event_type, (0.4, 0.45))
+            when = str(ev.timestamp)[:10] if ev.timestamp else None
+            items.append(EvidenceItem(
+                source=EvidenceSource.AGENT_LOG, file=rel,
+                detail=f"dsh: {ev.event_type} {rel}（{ev.actor}）",
+                when=when, ai_score=score, confidence=conf))
+    if files:
+        notes.append(f"DSH 日志（统一事件系统）：解析 {len(files)} 个文件，桥接 {total} 条证据")
+    return items, notes
+
+
 def collect_agent_evidence(root: Path, scan: ScanResult, config):
     """聚合所有 Agent 日志源。返回 (证据列表, 参与度描述, 备注列表)。"""
     events: list[AgentEvent] = []
@@ -251,7 +294,7 @@ def collect_agent_evidence(root: Path, scan: ScanResult, config):
         events.extend(evs)
         notes.extend(nts)
     if config.dsh_logs_dir:
-        evs, nts = collect_generic(root, scan, Path(config.dsh_logs_dir).expanduser(), "dsh")
+        evs, nts = collect_dsh_events(root, scan, config.dsh_logs_dir)
         events.extend(evs)
         notes.extend(nts)
     if config.cursor_logs_dir:

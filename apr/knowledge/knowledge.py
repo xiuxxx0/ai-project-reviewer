@@ -391,12 +391,19 @@ def build_knowledge_graph(profile: Profile | None = None,
         graph.add_node(KnowledgeNode(id="tech:" + tech, kind="tech", name=tech,
                                      properties=props))
 
-    # 2) 文件节点 + uses / written-in 关系
+    # 2) 文件节点 + uses / written-in 关系（挂 AI 贡献证据）
     for tech, entries in sorted(usage.items()):
         tech_id = "tech:" + tech
         for entry in entries:
             file_id = "file:" + entry["file"]
-            graph.add_node(KnowledgeNode(id=file_id, kind="file", name=entry["file"]))
+            props: dict = {}
+            if evidence is not None:
+                verdict = evidence.per_file.get(entry["file"])
+                if verdict and verdict.score is not None and verdict.confidence >= 0.3:
+                    props["ai_contribution"] = round(verdict.score, 2)
+                    props["ai_classification"] = verdict.classification
+            graph.add_node(KnowledgeNode(id=file_id, kind="file",
+                                         name=entry["file"], properties=props))
             graph.add_relation(KnowledgeRelation(
                 source=file_id, target=tech_id, kind="uses",
                 detail="检测到 " + "、".join(entry["hits"]), confidence=0.9))
@@ -406,6 +413,17 @@ def build_knowledge_graph(profile: Profile | None = None,
                 graph.add_relation(KnowledgeRelation(
                     source=file_id, target="tech:" + lang, kind="written-in",
                     detail="语言归属"))
+    # 技术节点聚合：平均 AI 贡献度
+    for tech, entries in usage.items():
+        scores = []
+        if evidence is not None:
+            for entry in entries:
+                verdict = evidence.per_file.get(entry["file"])
+                if verdict and verdict.score is not None and verdict.confidence >= 0.3:
+                    scores.append(verdict.score)
+        if scores:
+            graph.nodes["tech:" + tech].properties["avg_ai_contribution"] = (
+                round(sum(scores) / len(scores), 2))
 
     # 3) 知识点节点：默认映射 + 档案主题
     for tech in sorted(usage):
@@ -475,6 +493,15 @@ MAX_TOPICS_PER_TECH = 5        # 每个技术核心知识点上限
 
 
 def _canvas_text(node) -> str:
+    if node.kind == "file" and node.properties.get("ai_contribution") is not None:
+        pct = round(node.properties["ai_contribution"] * 100)
+        return node.name + "\nAI 贡献 " + str(pct) + "%"
+    if node.kind == "tech" and node.properties.get("avg_ai_contribution") is not None:
+        pct = round(node.properties["avg_ai_contribution"] * 100)
+        text = "**" + node.name + "**\n平均 AI 贡献 " + str(pct) + "%"
+        if node.properties.get("file_count"):
+            text += " · 文件数 " + str(node.properties["file_count"])
+        return text
     if node.kind == "skill":
         mastery = node.properties.get("mastery_percent")
         suffix = (str(mastery) + "%") if mastery is not None else "未评估"
@@ -675,6 +702,10 @@ function build() {
     if (n.kind === 'skill' && n.props.mastery_percent !== null
         && n.props.mastery_percent !== undefined) {
       label = label + ' ' + n.props.mastery_percent + '%';
+    }
+    if (n.kind === 'file' && n.props.ai_contribution !== null
+        && n.props.ai_contribution !== undefined) {
+      label = label + ' [AI ' + Math.round(n.props.ai_contribution * 100) + '%]';
     }
     var t = document.createElementNS(NS, 'text');
     t.setAttribute('class', 'node-label');

@@ -251,6 +251,22 @@ class KnowledgeTest(unittest.TestCase):
         self.assertIn("掌握40%", content)
         self.assertIn("UserService.java", content)
 
+    def test_ai_contribution_in_graph(self):
+        from apr.evidence.base import EvidenceReport, FileVerdict
+        root = fixture_dir("knowledge")
+        _java_project(root)
+        scan = _scan(root)
+        evidence = EvidenceReport(items=[], per_file={
+            "UserService.java": FileVerdict(file="UserService.java", score=0.82,
+                                            confidence=0.8, items=[])})
+        graph = build_knowledge_graph(scan=scan, digest=_digest(root, scan),
+                                      evidence=evidence, skill_assessment=_assessment())
+        file_node = graph.nodes["file:UserService.java"]
+        self.assertEqual(file_node.properties["ai_contribution"], 0.82)
+        self.assertEqual(file_node.properties["ai_classification"], "AI 主导")
+        tech_node = graph.nodes["tech:Redis"]
+        self.assertEqual(tech_node.properties["avg_ai_contribution"], 0.82)
+
     def test_counts(self):
         g = KnowledgeGraph()
         g.add_node(KnowledgeNode(id="t:1", kind="tech", name="X"))
