@@ -131,11 +131,67 @@ python -m apr review .
 
 ## Quick Start
 
+First time? Follow these 5 steps (about 5 minutes):
+
+### 1. Install
+
 ```bash
-apr init                          # create apr.yaml + profile.yaml
-set DEEPSEEK_API_KEY=sk-xxx       # Windows (or export on macOS/Linux)
-apr review .                      # generate reports
+pip install repocourse
+apr --version          # → apr 0.1.0
 ```
+
+### 2. Initialize in your project
+
+```bash
+cd my-project
+apr init              # creates apr.yaml + profile.yaml
+```
+
+### 3. Configure (or try it free first)
+
+```bash
+# Option A: try it for free
+apr review . --provider mock
+
+# Option B: real analysis (get a key at platform.deepseek.com)
+export DEEPSEEK_API_KEY=sk-xxx
+apr config set --preset deepseek-flash   # cheaper; use deepseek-pro for quality
+```
+
+### 4. Quick preview (instant, no LLM)
+
+```bash
+apr scan .            # file stats / directory tree / tech stack
+```
+
+### 5. Generate the review (3-5 minutes for a real run)
+
+```bash
+apr review .          # add --skip-quiz to skip the quiz
+```
+
+```text
+✔ Technical review: output/README-review.md       ← for developers/interviews
+✔ Growth report:    output/learning_report.md     ← personal feedback for you
+```
+
+Then dig deeper as needed (all deterministic, no LLM calls):
+
+```bash
+apr graph .           # knowledge graph: web graph + Obsidian canvas + skill tree
+apr plan .            # personalized learning plan (short/mid-term tasks)
+apr quiz .            # AI-generated quiz
+apr web               # web UI
+```
+
+### FAQ
+
+| Question | Answer |
+|---|---|
+| What should I put in the profile? | Nothing works — the report marks "general perspective" assumptions; edit profile.yaml for personalization |
+| Model errors? | deepseek-chat is retired; the default deepseek-v4-pro works out of the box |
+| Where are the reports? | In the output/ subdirectory |
+
 
 ## Commands
 

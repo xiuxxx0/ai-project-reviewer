@@ -166,24 +166,67 @@ apr review .
 
 ## 快速开始
 
-1. 在目标项目根目录初始化配置：
+第一次使用？跟着这 5 步走（全程约 5 分钟）：
 
-       apr init
+### 1. 安装
 
-2. 设置 API Key（以 DeepSeek 为例）：
+```bash
+pip install repocourse
+apr --version          # → apr 0.1.0
+```
 
-       set DEEPSEEK_API_KEY=sk-xxx        （Windows）
-       export DEEPSEEK_API_KEY=sk-xxx     （macOS/Linux）
+### 2. 在项目目录初始化
 
-3. 编辑 profile.yaml，填写技能档案（支持新版结构：skills/mastered/learning/target
-   带等级与主题，也兼容旧版扁平格式）。
-4. 生成复盘报告：
+```bash
+cd 我的项目
+apr init              # 生成 apr.yaml + profile.yaml
+```
 
-       apr review .
+### 3. 配置（也可以先白嫖体验）
 
-   生成两份报告（位于项目根目录 output/ 下）：
-   - output/README复盘.md —— 技术复盘（面向开发者/面试）
-   - output/learning_report.md —— 学习成长反馈（面向学习者：学到了什么/AI 协作/盲区/学习路线）
+```bash
+# 方式 A：先体验，不花一分钱
+apr review . --provider mock
+
+# 方式 B：真实效果（platform.deepseek.com 申请 Key）
+set DEEPSEEK_API_KEY=sk-xxx        # Windows；macOS/Linux 用 export
+apr config set --preset deepseek-flash   # 便宜模型；高质量用 deepseek-pro
+```
+
+### 4. 快速预览项目（秒出，不调用 LLM）
+
+```bash
+apr scan .            # 文件统计 / 目录树 / 技术栈
+```
+
+### 5. 生成复盘（真实跑一次约 3-5 分钟）
+
+```bash
+apr review .          # 或加 --skip-quiz 跳过答题
+```
+
+```text
+✔ 技术复盘报告：output/README复盘.md         ← 面向开发者/面试，先看这份
+✔ 学习成长报告：output/learning_report.md    ← 面向你自己的成长反馈
+```
+
+之后按需深挖（均为确定性计算，不调用 LLM）：
+
+```bash
+apr graph .           # 知识图谱：网页图 + Obsidian 画布 + 学习技能树
+apr plan .            # 个性化学习计划（短期/中期任务）
+apr quiz .            # AI 出题考你
+apr web               # 网页操作界面
+```
+
+### 常见问题
+
+| 问题 | 解决 |
+|---|---|
+| 不知道档案填什么 | 直接跑也行——报告会标注「按通用视角推测」；想个性化再编辑 profile.yaml |
+| 模型报错 | deepseek-chat 已停用，默认已是 deepseek-v4-pro，无需修改 |
+| 报告在哪 | output/ 子目录里（不是项目根目录） |
+
 
 ## 报告结构
 
