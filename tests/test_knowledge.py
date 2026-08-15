@@ -139,6 +139,11 @@ class KnowledgeTest(unittest.TestCase):
         self.assertIn("<svg", content)
         self.assertIn("tech:Redis", content)
         self.assertIn("DATA.project", content)
+        self.assertIn("hub", content)               # 中心项目节点
+        self.assertIn("重新布局", content)           # 重置按钮
+        self.assertIn("#c7a5e6", content)           # Obsidian 风格连线色
+        self.assertIn("wheel", content)             # 缩放交互
+        self.assertIn("mouseenter", content)        # 悬停高亮
 
     def test_export_obsidian_canvas(self):
         root = fixture_dir("knowledge")
