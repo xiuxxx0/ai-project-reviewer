@@ -1,12 +1,12 @@
 {
   "version": 1,
   "project": "ai-project-reviewer",
-  "generated_at": "2026-08-15T16:14:34",
+  "generated_at": "2026-08-15T16:19:07",
   "stats": {
-    "total_nodes": 121,
-    "total_relations": 123,
-    "file": 3,
-    "tech": 26,
+    "total_nodes": 123,
+    "total_relations": 138,
+    "file": 4,
+    "tech": 27,
     "topic": 75,
     "skill": 17
   },
@@ -21,6 +21,12 @@
       "id": "file:apr/knowledge/knowledge.py",
       "kind": "file",
       "name": "apr/knowledge/knowledge.py",
+      "properties": {}
+    },
+    {
+      "id": "file:knowledge_graph.json",
+      "kind": "file",
+      "name": "knowledge_graph.json",
       "properties": {}
     },
     {
@@ -264,6 +270,14 @@
       "name": "HTML/CSS",
       "properties": {
         "from_profile": true
+      }
+    },
+    {
+      "id": "tech:JSON",
+      "kind": "tech",
+      "name": "JSON",
+      "properties": {
+        "file_count": 1
       }
     },
     {
@@ -909,6 +923,20 @@
   ],
   "relations": [
     {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:Django",
+      "kind": "uses",
+      "detail": "检测到 django、settings.py、urlpatterns、ModelAdmin",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:JSON",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:Django",
       "kind": "uses",
@@ -923,10 +951,24 @@
       "confidence": 1.0
     },
     {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:Elasticsearch",
+      "kind": "uses",
+      "detail": "检测到 ElasticsearchRestTemplate、RestHighLevelClient、elasticsearch",
+      "confidence": 0.9
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:Elasticsearch",
       "kind": "uses",
       "detail": "检测到 ElasticsearchRestTemplate、RestHighLevelClient、elasticsearch",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:FastAPI",
+      "kind": "uses",
+      "detail": "检测到 FastAPI(、fastapi、APIRouter、Depends(",
       "confidence": 0.9
     },
     {
@@ -937,10 +979,24 @@
       "confidence": 0.9
     },
     {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:JWT",
+      "kind": "uses",
+      "detail": "检测到 Jwt、jwt、JsonWebToken、JJWT、@PreAuthorize",
+      "confidence": 0.9
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:JWT",
       "kind": "uses",
       "detail": "检测到 Jwt、jwt、JsonWebToken、JJWT、@PreAuthorize",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:Kafka",
+      "kind": "uses",
+      "detail": "检测到 KafkaTemplate、@KafkaListener、KafkaProducer、kafka-python",
       "confidence": 0.9
     },
     {
@@ -951,10 +1007,24 @@
       "confidence": 0.9
     },
     {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:MongoDB",
+      "kind": "uses",
+      "detail": "检测到 MongoTemplate、mongodb、pymongo、MongoRepository、mongoengine",
+      "confidence": 0.9
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:MongoDB",
       "kind": "uses",
       "detail": "检测到 MongoTemplate、mongodb、pymongo、MongoRepository、mongoengine",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:MyBatis",
+      "kind": "uses",
+      "detail": "检测到 SqlSessionFactory、mybatis、@Mapper、Mapper.xml",
       "confidence": 0.9
     },
     {
@@ -965,7 +1035,7 @@
       "confidence": 0.9
     },
     {
-      "source": "file:apr/knowledge/knowledge.py",
+      "source": "file:knowledge_graph.json",
       "target": "tech:MySQL",
       "kind": "uses",
       "detail": "检测到 JdbcTemplate、DataSource、jdbc:mysql、MyBatis、@Mapper",
@@ -973,9 +1043,30 @@
     },
     {
       "source": "file:apr/knowledge/knowledge.py",
+      "target": "tech:MySQL",
+      "kind": "uses",
+      "detail": "检测到 JdbcTemplate、DataSource、jdbc:mysql、MyBatis、@Mapper",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:knowledge_graph.json",
       "target": "tech:REST API",
       "kind": "uses",
       "detail": "检测到 @GetMapping、@PostMapping、@PutMapping、@DeleteMapping、@RequestMapping",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:apr/knowledge/knowledge.py",
+      "target": "tech:REST API",
+      "kind": "uses",
+      "detail": "检测到 @GetMapping、@PostMapping、@PutMapping、@DeleteMapping、@RequestMapping",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:React",
+      "kind": "uses",
+      "detail": "检测到 useState、useEffect、ReactDOM、createRoot、jsx",
       "confidence": 0.9
     },
     {
@@ -1000,6 +1091,13 @@
       "confidence": 0.9
     },
     {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:Redis",
+      "kind": "uses",
+      "detail": "检测到 RedisTemplate、StringRedisTemplate、Redisson、redisTemplate、@Cacheable",
+      "confidence": 0.9
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:Redis",
       "kind": "uses",
@@ -1021,6 +1119,13 @@
       "confidence": 1.0
     },
     {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:Spring",
+      "kind": "uses",
+      "detail": "检测到 @RestController、@Controller、@Service、@Autowired、@Component",
+      "confidence": 0.9
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:Spring",
       "kind": "uses",
@@ -1035,10 +1140,24 @@
       "confidence": 0.9
     },
     {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:Spring Boot",
+      "kind": "uses",
+      "detail": "检测到 @SpringBootApplication、spring-boot-starter、SpringBootApplication",
+      "confidence": 0.9
+    },
+    {
       "source": "file:apr/knowledge/knowledge.py",
       "target": "tech:Spring Boot",
       "kind": "uses",
       "detail": "检测到 @SpringBootApplication、spring-boot-starter、SpringBootApplication",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:knowledge_graph.json",
+      "target": "tech:Vue",
+      "kind": "uses",
+      "detail": "检测到 createApp、<script setup>、ref(、reactive(、useRouter",
       "confidence": 0.9
     },
     {

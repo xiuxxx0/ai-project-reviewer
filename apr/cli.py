@@ -220,8 +220,10 @@ def cmd_graph(project: Path, cfg: Config, args) -> int:
     if not out.is_absolute():
         out = project / out
     graph.save(out)
+    html_out = graph.export_html(out.with_suffix(".html"))
     counts = graph.counts()
     print(f"✔ 知识图谱已生成：{out}")
+    print(f"  可视化页面：{html_out}（浏览器打开）")
     print(f"  节点 {counts['total_nodes']}（文件 {counts['file']} / 技术 {counts['tech']} / "
           f"知识点 {counts['topic']} / 技能 {counts['skill']}）｜ 关系 {counts['total_relations']}")
     return 0

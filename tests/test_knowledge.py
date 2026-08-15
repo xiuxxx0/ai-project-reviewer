@@ -127,6 +127,19 @@ class KnowledgeTest(unittest.TestCase):
         self.assertEqual(graph.relations, [])
         self.assertEqual(graph.to_dict()["stats"]["total_nodes"], 0)
 
+    def test_export_html(self):
+        root = fixture_dir("knowledge")
+        _java_project(root)
+        scan = _scan(root)
+        graph = build_knowledge_graph(scan=scan, digest=_digest(root, scan),
+                                      skill_assessment=_assessment())
+        out = graph.export_html(root / "knowledge_graph.html")
+        self.assertTrue(out.is_file())
+        content = out.read_text(encoding="utf-8")
+        self.assertIn("<svg", content)
+        self.assertIn("tech:Redis", content)
+        self.assertIn("DATA.project", content)
+
     def test_counts(self):
         g = KnowledgeGraph()
         g.add_node(KnowledgeNode(id="t:1", kind="tech", name="X"))

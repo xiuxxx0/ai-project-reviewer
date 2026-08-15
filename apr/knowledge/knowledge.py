@@ -142,6 +142,13 @@ class KnowledgeGraph:
                         encoding="utf-8")
         return path
 
+    def export_html(self, path: Path) -> Path:
+        """导出零依赖的交互式可视化 HTML（内嵌数据 + 原生 JS 力导向布局）。"""
+        data = json.dumps(self.to_dict(), ensure_ascii=False).replace("</", "<\\/")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(_HTML_TEMPLATE.replace("__DATA__", data), encoding="utf-8")
+        return path
+
     def render_text(self) -> str:
         c = self.counts()
         lines = [
@@ -287,3 +294,139 @@ def build_knowledge_graph(profile: Profile | None = None,
                            f"置信度 {entry.confidence:.0%}）",
                     confidence=entry.confidence))
     return graph
+
+
+# 零依赖可视化模板：内嵌数据 + 原生 JS 力导向布局（无 CDN、无第三方库）
+_HTML_TEMPLATE = r"""<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Graph</title>
+<style>
+body { background:#0f1420; color:#e6e9f0; font-family:"Segoe UI","Microsoft YaHei",sans-serif; margin:0; }
+header { padding:14px 20px; background:#1a2130; border-bottom:1px solid #2a3448; }
+h1 { font-size:18px; margin:0 0 6px 0; }
+.legend span { margin-right:16px; font-size:12px; }
+.legend i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; }
+svg { display:block; margin:0 auto; }
+.edge { stroke:#3a465e; stroke-opacity:.55; stroke-width:1; }
+.node { cursor:pointer; }
+.node circle { stroke:#0f1420; stroke-width:1.5; }
+#tip { position:fixed; background:#1a2130; border:1px solid #2a3448; border-radius:8px;
+       padding:10px 12px; font-size:12px; line-height:1.7; max-width:360px; display:none; z-index:9; }
+#tip b { color:#7ab3ff; }
+.hint { color:#8b93a7; font-size:12px; margin-top:4px; }
+</style>
+</head>
+<body>
+<header>
+<h1>Knowledge Graph — <span id="stats"></span></h1>
+<div class="legend">
+<span><i style="background:#60a5fa"></i>文件</span>
+<span><i style="background:#34d399"></i>技术</span>
+<span><i style="background:#fbbf24"></i>知识点</span>
+<span><i style="background:#a78bfa"></i>技能（掌握程度 %）</span>
+</div>
+<div class="hint">拖动节点调整布局 ｜ 点击节点查看属性与关联 ｜ 数据来自 knowledge_graph.json</div>
+</header>
+<svg id="svg" width="1280" height="780"></svg>
+<div id="tip"></div>
+<script>
+var DATA = __DATA__;
+var COLORS = { file:'#60a5fa', tech:'#34d399', topic:'#fbbf24', skill:'#a78bfa' };
+var W = 1280, H = 780;
+var nodes = DATA.nodes, edges = DATA.relations;
+var pos = {}, idMap = {};
+nodes.forEach(function (n, i) {
+  idMap[n.id] = n;
+  var ang = (i / Math.max(1, nodes.length)) * Math.PI * 2;
+  var r = Math.min(W, H) / 2.7;
+  pos[n.id] = { x: W/2 + r * Math.cos(ang), y: H/2 + r * Math.sin(ang) };
+});
+var disp = {};
+for (var iter = 0; iter < 500; iter++) {
+  var ids = Object.keys(pos);
+  ids.forEach(function (k) { disp[k] = { x:0, y:0 }; });
+  for (var i = 0; i < ids.length; i++) {
+    for (var j = i + 1; j < ids.length; j++) {
+      var a = pos[ids[i]], b = pos[ids[j]];
+      var dx = a.x - b.x, dy = a.y - b.y;
+      var d2 = dx * dx + dy * dy || 1;
+      var f = 9000 / d2, d = Math.sqrt(d2);
+      disp[ids[i]].x += dx / d * f; disp[ids[i]].y += dy / d * f;
+      disp[ids[j]].x -= dx / d * f; disp[ids[j]].y -= dy / d * f;
+    }
+  }
+  edges.forEach(function (e) {
+    if (!pos[e.source] || !pos[e.target]) return;
+    var dx = pos[e.target].x - pos[e.source].x, dy = pos[e.target].y - pos[e.source].y;
+    var d = Math.sqrt(dx * dx + dy * dy) || 1, f = d * 0.0025;
+    disp[e.source].x += dx / d * f; disp[e.source].y += dy / d * f;
+    disp[e.target].x -= dx / d * f; disp[e.target].y -= dy / d * f;
+  });
+  ids.forEach(function (k) {
+    pos[k].x = Math.max(60, Math.min(W - 60, pos[k].x + disp[k].x * 0.05));
+    pos[k].y = Math.max(60, Math.min(H - 60, pos[k].y + disp[k].y * 0.05));
+  });
+}
+var svg = document.getElementById('svg');
+svg.innerHTML = '';
+edges.forEach(function (e) {
+  if (!pos[e.source] || !pos[e.target]) return;
+  var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', pos[e.source].x); line.setAttribute('y1', pos[e.source].y);
+  line.setAttribute('x2', pos[e.target].x); line.setAttribute('y2', pos[e.target].y);
+  line.setAttribute('class', 'edge');
+  svg.appendChild(line);
+});
+nodes.forEach(function (n) {
+  var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('transform', 'translate(' + pos[n.id].x + ',' + pos[n.id].y + ')');
+  var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  c.setAttribute('r', n.kind === 'tech' ? 10 : (n.kind === 'skill' ? 12 : 6));
+  c.setAttribute('fill', COLORS[n.kind] || '#888');
+  c.setAttribute('class', 'node');
+  g.appendChild(c);
+  var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  var label = n.name;
+  if (label.length > 16) label = label.slice(0, 15) + '…';
+  if (n.kind === 'skill' && n.properties && n.properties.mastery_percent !== null
+      && n.properties.mastery_percent !== undefined) {
+    label = label + ' ' + n.properties.mastery_percent + '%';
+  }
+  t.setAttribute('y', n.kind === 'skill' ? 26 : 16);
+  t.setAttribute('text-anchor', 'middle');
+  t.setAttribute('font-size', n.kind === 'tech' ? '11' : '9');
+  t.setAttribute('fill', '#cdd5e4');
+  t.textContent = label;
+  g.appendChild(t);
+  g.addEventListener('click', function (ev) {
+    var tip = document.getElementById('tip');
+    var html = '<b>' + n.name + '</b>（' + n.kind + '）';
+    var props = n.properties || {};
+    Object.keys(props).forEach(function (k) {
+      html += '<br>' + k + ': ' + props[k];
+    });
+    var rels = edges.filter(function (r) { return r.source === n.id || r.target === n.id; });
+    if (rels.length) {
+      html += '<br><br>关联（' + rels.length + '）：';
+      rels.slice(0, 8).forEach(function (r) {
+        var other = r.source === n.id ? r.target : r.source;
+        var otherNode = idMap[other];
+        html += '<br>· ' + (otherNode ? otherNode.name : other) + '（' + r.kind + '）';
+      });
+    }
+    tip.innerHTML = html;
+    tip.style.display = 'block';
+    tip.style.left = (ev.clientX + 14) + 'px';
+    tip.style.top = (ev.clientY + 14) + 'px';
+  });
+  svg.appendChild(g);
+});
+document.getElementById('stats').textContent = '节点 ' + nodes.length + ' / 关系 '
+  + edges.length + '（' + DATA.project + '，' + DATA.generated_at + '）';
+</script>
+</body>
+</html>
+"""
