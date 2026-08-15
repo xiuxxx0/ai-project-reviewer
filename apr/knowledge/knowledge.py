@@ -211,10 +211,11 @@ class KnowledgeGraph:
             for tid in topic_ids:
                 node = self.nodes.get(tid)
                 lines.append("      " + _mm_safe(node.name if node else tid))
-            skill_rels = [r for r in self.relations
-                          if r.source == tech.id and r.target.startswith("skill:")]
-            for rel in skill_rels:
-                node = self.nodes.get(rel.target)
+            skill_ids = sorted({r.target for r in self.relations
+                                    if r.source == tech.id
+                                    and r.target.startswith("skill:")})
+            for sid in skill_ids:
+                node = self.nodes.get(sid)
                 if node is None:
                     continue
                 mastery = node.properties.get("mastery_percent")

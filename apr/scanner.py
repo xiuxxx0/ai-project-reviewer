@@ -15,6 +15,7 @@ DEFAULT_IGNORES = [
     ".DS_Store", "Thumbs.db", ".next/", ".nuxt/", ".cache/", "coverage/",
     ".pytest_cache/", ".mypy_cache/", ".ruff_cache/", "*.egg-info/", ".tox/",
     "target/", ".apr/", "*.min.js", "*.min.css",
+    "knowledge_graph.*", "README复盘.md",
 ]
 
 
