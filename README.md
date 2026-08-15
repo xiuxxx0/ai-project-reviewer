@@ -87,6 +87,59 @@ flowchart TD
     F --> H[生成学习建议 learning_report.md]
 ```
 
+## 输出示例
+
+运行：
+
+```bash
+apr review .
+```
+
+一次复盘生成以下产物：
+
+```text
+你的项目/
+├── output/
+│   ├── README复盘.md         # 技术复盘：8 大板块 + 技能评估 + 学习路线 + 证据附录
+│   └── learning_report.md    # 学习成长反馈：学到什么 / AI 协作 / 盲区 / 学习路线
+├── knowledge_graph.*         # 知识图谱：json/html/canvas/mindmap + 学习技能树
+└── learning_plan.json        # 个性化学习计划（apr plan）
+```
+
+### 技术复盘《README复盘.md》节选
+
+```markdown
+## AI 协作分析
+
+| AI 代码生成 | AI 辅助修改 | 人工设计 |
+| --- | --- | --- |
+| 0% | 10% | 90% |
+
+**AI 主要用于**：
+
+- ✓ 代码生成（3 个文件由 AI 主导或辅助）
+
+**你的优势**：
+
+- 能够修改和整合 AI 代码
+```
+
+### 学习成长报告《learning_report.md》节选
+
+```markdown
+## 4. 我的学习盲区
+
+### REST API
+
+为什么：
+- 项目使用REST API
+- 用户没有相关经验
+- 暂无 Quiz 验证
+- 代码以人工编写为主
+```
+
+> 完整示例见本仓库 output/ 目录——对 RepoCourse 自身复盘的真实产物。
+
 ## 安装
 
     pip install -e .
