@@ -15,4 +15,4 @@ apr = "apr.cli:main"
 
 [tool.setuptools]
 packages = ["apr", "apr.llm", "apr.evidence", "apr.assessment", "apr.prompts",
-            "apr.knowledge", "apr.events"]
+            "apr.knowledge", "apr.events", "apr.coach"]
