@@ -94,6 +94,51 @@ class JobRegistry:
             return jobs[:20]
 
 
+
+
+class QuizSession:
+    """一次网页答题会话。"""
+
+    def __init__(self, quiz_id, project, questions, essay, cfg):
+        self.id = quiz_id
+        self.project = project
+        self.questions = questions   # list[Question]
+        self.essay = essay
+        self.cfg = cfg
+        self.started_at = time.time()
+
+
+class QuizRegistry:
+    def __init__(self, max_quizzes: int = 50):
+        self._quizzes: dict[str, QuizSession] = {}
+        self._lock = threading.Lock()
+        self.max_quizzes = max_quizzes
+
+    def add(self, session: QuizSession) -> None:
+        with self._lock:
+            self._quizzes[session.id] = session
+            if len(self._quizzes) > self.max_quizzes:
+                oldest = min(self._quizzes.values(), key=lambda s: s.started_at)
+                self._quizzes.pop(oldest.id, None)
+
+    def get(self, quiz_id: str) -> QuizSession | None:
+        with self._lock:
+            return self._quizzes.get(quiz_id)
+
+
+def _start_quiz(project: str, config_path, llm_overrides) -> QuizSession:
+    """生成答题会话：扫描项目 → LLM 出题。"""
+    from .assessment.quiz import generate_questions
+    from .llm.factory import create_provider
+    cfg = load_config(Path(project), config_path)
+    cfg = _apply_llm_overrides(cfg, llm_overrides)
+    scan = scan_project(Path(project), cfg.limits)
+    digest = build_digest(Path(project), scan, cfg.limits)
+    llm = create_provider(cfg.llm)
+    questions, essay = generate_questions(
+        llm, digest.render(include_excerpts=False), cfg.quiz.question_count)
+    return QuizSession(uuid.uuid4().hex[:12], project, questions, essay, cfg)
+
 def _apply_llm_overrides(cfg, overrides: dict):
     for key in ("provider", "model", "base_url", "api_key"):
         value = overrides.get(key)
@@ -192,8 +237,76 @@ class Handler(BaseHTTPRequestHandler):
             return
         self._send_json({"error": "not found"}, 404)
 
+    def _read_body(self) -> dict:
+        length = int(self.headers.get("Content-Length") or 0)
+        try:
+            body = self.rfile.read(length).decode("utf-8", errors="replace")
+            return json.loads(body) if body else {}
+        except json.JSONDecodeError:
+            return {}
+
     def do_POST(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/api/quiz/start":
+            project, err = self._read_project()
+            if err:
+                self._send_json({"error": err}, 400)
+                return
+            try:
+                session = _start_quiz(project, self.server.config_path,
+                                      self.server.llm_overrides)
+            except AprError as e:
+                self._send_json({"error": str(e)}, 500)
+                return
+            self.server.quiz_registry.add(session)
+            self._send_json({
+                "quiz_id": session.id,
+                "questions": [{"id": q.id, "question": q.question,
+                               "options": q.options, "topic": q.topic}
+                              for q in session.questions],
+                "essay": session.essay,
+            })
+            return
+        if parsed.path == "/api/quiz/check":
+            body = self._read_body()
+            session = self.server.quiz_registry.get(str(body.get("quiz_id") or ""))
+            q = next((x for x in session.questions if x.id == body.get("qid")), None) if session else None
+            if not session or q is None:
+                self._send_json({"error": "会话不存在"}, 404)
+                return
+            answer = str(body.get("answer") or "")
+            self._send_json({
+                "correct": answer == q.options[q.answer_index],
+                "correct_index": q.answer_index,
+                "explanation": q.explanation,
+            })
+            return
+        if parsed.path == "/api/quiz/finish":
+            from .assessment.quiz import grade_answers
+            from .llm.factory import create_provider
+            body = self._read_body()
+            session = self.server.quiz_registry.get(str(body.get("quiz_id") or ""))
+            if not session:
+                self._send_json({"error": "会话不存在"}, 404)
+                return
+            raw_answers = body.get("answers") or []
+            answer_map = {str(a.get("id")): str(a.get("answer") or "") for a in raw_answers}
+            answer_list = [answer_map.get(q.id, "") for q in session.questions]
+            essay_answer = str(body.get("essay_answer") or "")
+            try:
+                llm = create_provider(session.cfg.llm)
+                graded = grade_answers(llm, session.questions, answer_list,
+                                       session.essay, essay_answer)
+            except AprError as e:
+                self._send_json({"error": str(e)}, 500)
+                return
+            self._send_json({
+                "items": graded["items"],
+                "overall": graded["overall"],
+                "weakest_topics": graded["weakest_topics"],
+                "correct_map": {q.id: q.answer_index for q in session.questions},
+            })
+            return
         if parsed.path == "/api/review":
             project, err = self._read_project()
             if err:
@@ -241,6 +354,7 @@ def create_server(host: str, port: int, config_path: Path | None,
                   llm_overrides: dict) -> ThreadingHTTPServer:
     server = ThreadingHTTPServer((host, port), Handler)
     server.registry = JobRegistry()
+    server.quiz_registry = QuizRegistry()
     server.config_path = config_path
     server.llm_overrides = llm_overrides or {}
     return server
@@ -285,6 +399,18 @@ pre { background: #0d1119; border: 1px solid #2a3448; border-radius: 8px; paddin
 .failed { background: #b91c1c; color: #ffdcdc; }
 a { color: #7ab3ff; }
 .hidden { display: none; }
+.quiz-topic { color:#8b93a7; font-size:12px; margin:4px 0 8px 0; }
+.quiz-q { font-size:15px; font-weight:600; margin:10px 0 14px 0; line-height:1.6; }
+.quiz-opt { padding:10px 14px; border:1px solid #34405a; border-radius:8px; margin:8px 0; cursor:pointer; font-size:14px; transition: background .15s; }
+.quiz-opt:hover { background:#232c3f; }
+.quiz-right { background:#123a24; border-color:#15803d; }
+.quiz-wrong { background:#3a1a1a; border-color:#b91c1c; }
+.quiz-fb { margin-top:12px; font-size:14px; line-height:1.7; }
+.quiz-exp { color:#8b93a7; font-size:12.5px; }
+.quiz-nav { margin-top:14px; }
+.quiz-essay { background:#0d1119; border:1px solid #2a3448; border-radius:8px; padding:12px; font-size:13px; line-height:1.6; margin:8px 0; }
+.quiz-result { font-size:22px; font-weight:700; margin:12px 0; color:#7ab3ff; }
+textarea { width:100%; box-sizing:border-box; background:#0f1420; color:#e6e9f0; border:1px solid #34405a; border-radius:8px; padding:10px; font-family:inherit; font-size:13px; }
 </style>
 </head>
 <body>
@@ -315,6 +441,10 @@ a { color: #7ab3ff; }
 <div class="card hidden" id="reportCard">
 <div class="sub">报告预览</div>
 <pre id="report"></pre>
+<div class="card" id="quizCard">
+<div class="sub">答题挑战 · 新手友好 <span id="quizProgress"></span></div>
+<button id="btnQuiz">开始答题</button>
+<div id="quizBody" class="hidden"></div>
 </div>
 </div>
 <script>
@@ -391,6 +521,107 @@ async function poll() {
     badge.className = "badge failed";
   }
 }
+var quizState = null;
+
+document.getElementById("btnQuiz").onclick = async function () {
+  var project = document.getElementById("project").value.trim();
+  if (!project) { alert("请输入项目路径"); return; }
+  var data = await postJson("/api/quiz/start", { project: project });
+  if (data.error) { alert(data.error); return; }
+  quizState = { id: data.quiz_id, questions: data.questions, essay: data.essay,
+                idx: 0, answers: [], answered: false };
+  document.getElementById("quizBody").classList.remove("hidden");
+  document.getElementById("quizProgress").textContent = "（共 " + data.questions.length + " 题）";
+  renderQuiz();
+};
+
+function renderQuiz() {
+  var s = quizState;
+  var q = s.questions[s.idx];
+  var body = document.getElementById("quizBody");
+  var html = "<div class=\"quiz-topic\">" + (q.topic || "") + "</div>";
+  html += "<div class=\"quiz-q\">" + (s.idx + 1) + "/" + s.questions.length + ". " + q.question + "</div>";
+  for (var i = 0; i < q.options.length; i++) {
+    html += "<div class=\"quiz-opt\" data-i=\"" + i + "\">" + q.options[i] + "</div>";
+  }
+  html += "<div class=\"quiz-fb hidden\" id=\"quizFb\"></div>";
+  html += "<div class=\"quiz-nav hidden\" id=\"quizNav\"><button id=\"quizNext\">下一题</button></div>";
+  body.innerHTML = html;
+  var opts = body.querySelectorAll(".quiz-opt");
+  for (var j = 0; j < opts.length; j++) {
+    opts[j].onclick = function () {
+      if (quizState.answered) return;
+      quizState.answered = true;
+      var idx = parseInt(this.getAttribute("data-i"), 10);
+      var answer = q.options[idx];
+      quizState.answers.push({ id: q.id, answer: answer });
+      checkAnswer(q.id, answer, idx);
+    };
+  }
+}
+
+async function checkAnswer(qid, answer, chosenIdx) {
+  var s = quizState;
+  var data = await postJson("/api/quiz/check", { quiz_id: s.id, qid: qid, answer: answer });
+  if (data.error) { alert(data.error); return; }
+  var body = document.getElementById("quizBody");
+  var opts = body.querySelectorAll(".quiz-opt");
+  for (var i = 0; i < opts.length; i++) {
+    if (i === data.correct_index) opts[i].classList.add("quiz-right");
+    else if (i === chosenIdx) opts[i].classList.add("quiz-wrong");
+  }
+  var fb = document.getElementById("quizFb");
+  fb.classList.remove("hidden");
+  fb.innerHTML = (data.correct ? "✅ 回答正确！" : "❌ 回答错误")
+    + "<br><span class=\"quiz-exp\">" + data.explanation + "</span>";
+  var nav = document.getElementById("quizNav");
+  nav.classList.remove("hidden");
+  var btn = document.getElementById("quizNext");
+  btn.textContent = (s.idx + 1 >= s.questions.length) ? "交卷" : "下一题";
+  btn.onclick = function () {
+    if (s.idx + 1 < s.questions.length) {
+      s.idx += 1; s.answered = false; renderQuiz();
+    } else {
+      showEssay();
+    }
+  };
+}
+
+function showEssay() {
+  var s = quizState;
+  var body = document.getElementById("quizBody");
+  var html = "<div class=\"quiz-q\">简答题</div>";
+  html += "<div class=\"quiz-essay\">" + s.essay + "</div>";
+  html += "<textarea id=\"essayInput\" rows=\"4\" placeholder=\"写下你的理解（也可以跳过）\"></textarea>";
+  html += "<div class=\"quiz-nav\"><button id=\"quizFinish\">交卷</button></div>";
+  body.innerHTML = html;
+  document.getElementById("quizFinish").onclick = finishQuiz;
+}
+
+async function finishQuiz() {
+  var s = quizState;
+  var essayAnswer = (document.getElementById("essayInput") || {}).value || "";
+  var data = await postJson("/api/quiz/finish", {
+    quiz_id: s.id, answers: s.answers, essay_answer: essayAnswer });
+  if (data.error) { alert(data.error); return; }
+  var body = document.getElementById("quizBody");
+  var html = "<div class=\"quiz-result\">总体评分：" + data.overall + "/100</div>";
+  if (data.weakest_topics && data.weakest_topics.length) {
+    html += "<div class=\"quiz-topic\">薄弱主题：" + data.weakest_topics.join("、") + "</div>";
+  }
+  var items = data.items || [];
+  for (var i = 0; i < items.length; i++) {
+    html += "<div class=\"quiz-exp\">" + (i + 1) + ". 得分 " + items[i].score + "：" + (items[i].comment || "") + "</div>";
+  }
+  html += "<div class=\"quiz-nav\"><button id=\"quizDone\">完成</button></div>";
+  body.innerHTML = html;
+  document.getElementById("quizDone").onclick = function () {
+    body.innerHTML = "";
+    body.classList.add("hidden");
+    quizState = null;
+  };
+}
+
 </script>
 </body>
 </html>

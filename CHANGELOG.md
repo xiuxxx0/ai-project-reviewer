@@ -2,6 +2,13 @@
 
 本项目的所有重要变更都会记录在此文件中。
 
+## [0.1.1] - 2026-08-15
+
+### 新增
+
+- 网页答题挑战（apr web）：AI 出题 → 点选立即判对错 + 解析 → 交卷出总分与薄弱主题
+  （/api/quiz/start、/api/quiz/check、/api/quiz/finish）
+
 ## [0.1.0] - 2026-08-15
 
 首个正式版本：AI 时代的项目学习复盘助手。
@@ -29,4 +36,5 @@
 - PyPI 发布（pip install repocourse）
 - post-commit 自动推送钩子
 
+[0.1.1]: https://github.com/xiuxxx0/ai-project-reviewer/releases/tag/v0.1.1
 [0.1.0]: https://github.com/xiuxxx0/ai-project-reviewer/releases/tag/v0.1.0
