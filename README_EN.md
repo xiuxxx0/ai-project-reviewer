@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-![PyPI](https://img.shields.io/pypi/v/repocourse)
+![PyPI](https://img.shields.io/pypi/v/repocourse?v=011)
 ![Downloads](https://img.shields.io/pypi/dm/repocourse)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
