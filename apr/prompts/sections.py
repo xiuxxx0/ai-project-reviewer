@@ -4,7 +4,7 @@ from __future__ import annotations
 from ..llm.base import ChatMessage
 
 SECTION_TITLES = ["项目介绍", "技术栈", "项目结构", "核心代码分析",
-                  "AI 生成部分", "我的学习盲区", "面试问题", "下一步练习"]
+                  "AI 协作分析", "我的学习盲区", "面试问题", "下一步练习"]
 
 _LANG_HINT = {"zh": "使用简体中文输出。", "en": "Output in English."}
 

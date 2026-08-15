@@ -167,8 +167,8 @@ def run_review(project: Path, config: Config, progress: Progress,
     sections: list[tuple[str, str]] = []
     for idx, title in enumerate(SECTION_TITLES, 1):
         progress.section(idx, len(SECTION_TITLES), title)
-        if title == "我的学习盲区":
-            # 盲区由证据引擎计算（report 层渲染），不调用 LLM 猜测
+        if title in ("我的学习盲区", "AI 协作分析"):
+            # 盲区与 AI 协作分析由证据引擎计算（report 层渲染），不调用 LLM 猜测
             sections.append((title, ""))
             continue
         messages = build_section_messages(idx, digest_full, digest_short,

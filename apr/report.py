@@ -4,6 +4,7 @@ from __future__ import annotations
 from . import __version__
 from .analyzer import ReviewResult
 from .assessment.blindspot import detect_blind_spots
+from .assessment.collab import build_ai_collab_report
 from .assessment.skill import LEVEL_LABELS, SkillAssessment, assess_skills
 from .coach.planner import LearningPlan, build_learning_plan
 
@@ -94,14 +95,20 @@ def render_report(result: ReviewResult) -> str:
     meta.append(f"{n + 3}. [附录 A：AI 生成证据明细](#附录-aai-生成证据明细)")
     if result.quiz:
         meta.append(f"{n + 4}. [附录 B：实践验证记录](#附录-b实践验证记录)")
-    # 学习盲区：由证据引擎计算，替换 LLM 生成的占位内容
+    # 学习盲区与 AI 协作分析：由证据引擎计算，替换 LLM 占位内容
     blind_spots = detect_blind_spots(profile=result.profile, scan=result.scan,
                                      digest=result.digest, quiz=result.quiz,
                                      evidence=result.evidence)
     blind_md = blind_spots.render_markdown()
+    collab_md = build_ai_collab_report(result.evidence).render_markdown()
     body = ["", "---", ""]
     for title, md in result.sections:
-        body.append(blind_md if title == "我的学习盲区" else md)
+        if title == "我的学习盲区":
+            body.append(blind_md)
+        elif title == "AI 协作分析":
+            body.append(collab_md)
+        else:
+            body.append(md)
         body += ["", "---", ""]
     skill_assessment = assess_skills(result.profile, result.scan, result.quiz, result.evidence)
     body.append(_render_skill_section(skill_assessment))

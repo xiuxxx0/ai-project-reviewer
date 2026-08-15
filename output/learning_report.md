@@ -2,7 +2,7 @@
 
 ## 1. 我完成了什么项目
 
-**ai-project-reviewer** 是一个使用 Python 编写的项目（共 75 个文件），主要涉及 Python。
+**ai-project-reviewer** 是一个使用 Python 编写的项目（共 76 个文件），主要涉及 Python。
 
 通过这个项目，你实际接触了：
 

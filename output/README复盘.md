@@ -1,7 +1,7 @@
 # ai-project-reviewer · 项目复盘
 
 > 由 **AI Project Reviewer v0.1.0** 自动生成
-> 生成时间：2026-08-15T18:03:44 ｜ 模型：deepseek/deepseek-v4-pro ｜ 语言：zh
+> 生成时间：2026-08-15T18:33:06 ｜ 模型：deepseek/deepseek-v4-pro ｜ 语言：zh
 > 项目路径：C:\Users\MAO0909\Documents\DSH\ai-project-reviewer
 
 ## 目录
@@ -10,39 +10,40 @@
 2. [技术栈](#技术栈)
 3. [项目结构](#项目结构)
 4. [核心代码分析](#核心代码分析)
-5. [AI 生成部分](#AI 生成部分)
+5. [AI 协作分析](#AI 协作分析)
 6. [我的学习盲区](#我的学习盲区)
 7. [面试问题](#面试问题)
 8. [下一步练习](#下一步练习)
 9. [我的技能评估](#我的技能评估)
 10. [下一阶段学习路线](#下一阶段学习路线)
 11. [附录 A：AI 生成证据明细](#附录-aai-生成证据明细)
-12. [附录 B：实践验证记录](#附录-b实践验证记录)
 
 ---
 
 ## 项目介绍
 
-**一句话定位**：AI Project Reviewer（AI 项目复盘助手）是一个命令行/Web 工具，输入一个代码项目，自动生成结构化复盘报告《README复盘.md》，帮助用户理解项目、识别 AI 生成代码、发现个人学习盲区并准备面试。
+**一句话定位**：ai-project-reviewer 是一个 AI 项目复盘助手，输入一个代码项目后自动生成《README复盘.md》报告、知识图谱和个性化学习计划，形成“复盘 → 证据 → 盲区 → 技能评估 → 学习路线”的完整学习闭环。
 
 **主要功能/特性**：
-- 一键生成 8 大板块复盘报告，覆盖项目介绍、技术栈、项目结构、核心代码分析、AI 生成部分、学习盲区、面试问题和下一步练习，支持中英文配置。
-- 多源证据融合判定 AI 生成部分：综合 Git 提交历史、Agent 会话日志、代码内标记和变更轨迹，输出逐文件 AI 贡献度与置信度。
-- 个性化学习盲区：结合个人技能档案（profile.yaml）、项目能力需求和实践问答验证，动态生成盲区清单与学习路径。
-- 实践验证：AI 根据项目出题，用户在终端作答，AI 批改评分并计入报告。
-- 多 LLM 供应商支持：DeepSeek、OpenAI、任意 OpenAI 兼容端点、本地 Ollama 以及 mock（离线演示）。
-- 零第三方依赖：纯 Python 标准库实现（含内置简化 YAML 解析器），要求 Python ≥ 3.10。
-- 结果缓存、.gitignore 尊重、大项目限额保护，避免超限扫描。
-- Web 界面（基于标准库 http.server）支持项目预览、后台任务、实时进度日志、报告预览与下载。
+- 生成 12 节结构化复盘报告，涵盖 8 大板块、技能评估、学习路线及证据/问答附录，支持中文/英文。
+- 基于多源证据（Git 提交历史、Agent 会话日志、代码内标记、变更轨迹）逐文件判定 AI 贡献度与置信度。
+- 通过统一 Agent Event 系统接入 DSH、通用 JSONL 日志，桥接进证据层（Cursor 适配器暂未实现）。
+- 输出知识图谱（JSON + HTML + Obsidian Canvas + Mermaid 导图），展示“文件→技术→知识点→用户技能”四层关系及 AI 贡献徽标。
+- 由学习盲区证据引擎结合项目需求、技能档案、Quiz、AI 贡献和知识图谱五路信号计算盲区，非 AI 猜测。
+- 提供确定性 Learning Coach 学习计划生成器（`apr plan`），不调用 LLM，输出优先级与下一步实践项目。
+- 支持实践验证问答（`apr quiz`）：AI 出题、终端作答、AI 批改并计入报告。
+- 支持多 LLM 供应商（DeepSeek / OpenAI / OpenAI 兼容 / Ollama / mock），零第三方依赖，Python ≥ 3.10。
 
-**目标用户与典型使用场景**（推测）：主要面向希望系统复盘代码项目的开发者、学习者，尤其是需要评估项目中 AI 生成代码占比、识别自身技能盲区、准备技术面试的用户。典型场景包括：学习开源项目或自己项目后生成复盘报告；在 AI 辅助开发后审计 AI 贡献度；利用问答功能自测对项目的理解程度。
+**目标用户与典型使用场景**（推测）：目标用户是有代码项目复盘需求的开发者或学习者，可能用于个人项目总结、面试准备、识别自身技能盲区，或在 AI 辅助开发后回顾人与 AI 的协作分工。典型场景包括：对已完成的项目生成复盘报告以查漏补缺；通过知识图谱与技能评估定位“纸面掌握”；根据学习计划进行后续练习。
 
 **运行方式**：
-- 依赖：无第三方依赖，Python ≥ 3.10（依据 pyproject.toml 中 `requires-python = ">=3.10"` 和 `dependencies = []`）。
-- 安装：`pip install -e .`（安装后可通过 `apr` 命令使用），或不安装直接运行 `python -m apr ...`。
-- 启动与使用：通过 CLI 子命令执行，如 `apr review .` 生成复盘报告，`apr scan .` 只扫描并预览技术栈，`apr quiz .` 运行实践验证问答，`apr init .` 初始化配置文件，`apr graph .` 生成知识图谱，`apr web` 启动 Web 界面，`apr config` 查看/切换 LLM 配置。具体参数见 README 中的命令说明。
+- 安装：`pip install -e .`（或无需安装，直接运行 `python -m apr review .`）。
+- 初始化项目配置：`apr init`。
+- 设置 LLM API Key（例如 `DEEPSEEK_API_KEY` 环境变量）。
+- 生成复盘报告：`apr review <项目路径>`，默认在项目根目录 `output/` 下产出 `README复盘.md` 和 `learning_report.md`。
+- 其他命令：`apr scan`（只扫描技术栈）、`apr graph`（生成知识图谱）、`apr plan`（生成学习计划）、`apr quiz`（只运行问答）、`apr web`（启动 Web 界面）、`apr config`（交互式配置 LLM）。
 
-**项目规模速览**：扫描统计文件数 70（排除 19 项），主要语言为 Python（60 个文件），总大小 299.1KB。
+**项目规模速览**：共 76 个文件（扫描排除 22 项），主要语言为 Python（65 个文件），项目总大小 346.3KB。
 
 ---
 
@@ -52,119 +53,199 @@
 
 | 类别 | 技术 | 用途说明 |
 |------|------|----------|
-| 语言 | Python | 全部核心实现，要求 Python ≥ 3.10，纯标准库 |
-| 构建工具 | setuptools（≥68） | `pyproject.toml` 声明构建后端，生成 `apr` 命令入口 |
-| CLI 框架 | argparse（标准库） | `review/scan/quiz/init/graph/config/web` 子命令解析 |
-| Web 服务 | http.server（标准库） | Web 界面：项目预览、后台任务、进度轮询、报告预览/下载 |
-| LLM 接入 | DeepSeek / OpenAI / OpenAI 兼容端点 / Ollama / mock | 多供应商切换，CLI 参数与环境变量覆盖 |
-| 配置格式 | YAML | `apr.yaml`、`profile.yaml`；由内置简化解析器解析 |
-| 配置/元数据 | TOML | `pyproject.toml` 项目元数据与构建配置 |
-| 文档格式 | Markdown | README、复盘报告、知识图谱 mindmap、示例说明 |
-| 证据采集 | Git + Agent 日志 + 代码标记 | 多源证据融合，判定 AI 贡献度 |
-| 开发自动化 | Git `post-commit` 钩子 | 提交后自动推送 GitHub |
-| 测试框架 | 未明确（推测为标准库 `unittest`） | `tests/` 含 17 个 `test_*.py`，但运行时依赖为空 |
+| 语言 | Python | 项目主要开发语言，代码统计显示 Python 文件占绝大多数（65 个）；`pyproject.toml` 和 `README.md` 均要求 Python ≥ 3.10 |
+| 构建工具 | setuptools | `pyproject.toml` 的 `[build-system]` 声明 `requires = ["setuptools>=68"]`，用于项目的打包与构建 |
+| 包管理 | pip | `README.md` 安装说明为 `pip install -e .`，采用可编辑安装；同时通过 `pyproject.toml` 暴露命令行入口 `apr = "apr.cli:main"` |
+| CLI 框架 | argparse | `apr/cli.py` 导入 `argparse` 实现命令解析，包含 `review`、`scan`、`quiz`、`init`、`graph`、`plan`、`web`、`config` 等子命令 |
+| 配置解析 | 自研简化 YAML 解析器（`apr/_yaml.py`） | `README.md` 声明“含内置简化 YAML 解析器”；`apr/config.py` 导入 `parse_simple_yaml` 解析全局及项目级 `apr.yaml`、`profile.yaml`，实现零第三方依赖 |
+| 配置模板 | 内置字符串模板（`apr/templates.py`） | `apr/cli.py` 导入 `APR_YAML_TEMPLATE` 和 `PROFILE_YAML_TEMPLATE`，用于 `apr init` 生成默认配置文件 |
+| LLM 供应商集成 | DeepSeek / OpenAI / OpenAI 兼容端点 / Ollama / mock | `README.md` 列出多供应商支持；`apr/config.py` 中 `PROVIDER_DEFAULTS` 定义各供应商的默认 base_url、api_key_env、model；`apr/llm/` 目录包含 `base.py`、`factory.py`、`ollama.py`、`openai_compat.py`，采用统一工厂模式创建 provider。（具体 HTTP 客户端实现未展示，推测使用 Python 标准库） |
+| Web 界面 | Python 标准库 HTTP 服务器（推测） | `README.md` 提供 `apr web` 命令启动本地界面（http://127.0.0.1:8765），`apr/web.py` 文件存在；材料未展示实现细节，因项目零第三方依赖，推测使用标准库 `http.server` 实现 |
+| 数据输出格式 | JSON | 生成 `knowledge_graph.json` 标准图数据（README 说明）；根目录存在 `learning_plan.json` 示例 |
+| 文档格式 | Markdown | 生成 `README复盘.md` 报告；项目文档（README 等）及知识图谱导出的 `knowledge_graph-mindmap.md` 使用 Markdown |
+| 可视化输出 | HTML / Obsidian Canvas / Mermaid | `README.md` 描述知识图谱可导出 `knowledge_graph.html`（拖拽/缩放/悬停高亮）、`knowledge_graph.canvas`（Obsidian 分层画布）、`knowledge_graph-mindmap.md`（Mermaid 思维导图），均为自研导出，无第三方前端依赖 |
+| 测试 | Python 标准库 `unittest`（推测） | `tests/` 目录包含 20 个 `test_*.py` 文件；材料未显示导入 pytest 等第三方测试框架，结合零第三方依赖声明，推测使用标准库 `unittest` |
 
-### 关键技术与用途
+### 主要依赖版本
 
-- **Python（≥3.10）**  
-  `pyproject.toml` 明确 `requires-python = ">=3.10"`。README 声明“纯标准库实现（含内置简化 YAML 解析器），Python ≥ 3.10”。`apr/` 下所有核心模块如 `cli.py`、
+- Python：≥ 3.10（依据 `pyproject.toml` 的 `requires-python`）
+- setuptools：≥ 68（依据 `pyproject.toml` 的 `build-system.requires`）
+- 第三方运行时依赖：无（`pyproject.toml` 中 `dependencies = []`；`README.md` 声明“零第三方依赖”）
 
----
+### 技术选型点评
 
-
-
----
-
-
+1. **零第三方依赖是显著的技术选型**：项目通过标准库实现全部功能（包括自研简化 YAML 解析器），显著降低安装门槛和分发复杂度，适合作为通用 CLI 工具；但自研解析器可能仅支持 YAML 子集，对复杂配置（如锚点、多行字符串等）的支持可能有限（
 
 ---
 
-## AI 生成部分
+## 项目结构
 
-### 判定总览
+```text
+ai-project-reviewer/
+│   .githooks/
+│       post-commit
+│   apr/
+│   │   assessment/
+│   │   │   __init__.py
+│   │   │   blindspot.py
+│   │   │   collab.py
+│   │   │   quiz.py
+│   │       skill.py
+│   │   coach/
+│   │   │   __init__.py
+│   │       planner.py
+│   │   events/
+│   │   │   __init__.py
+│   │   │   base.py
+│   │   │   dsh.py
+│   │       generic.py
+│   │   evidence/
+│   │   │   __init__.py
+│   │   │   agent_logs.py
+│   │   │   base.py
+│   │   │   fusion.py
+│   │   │   git.py
+│   │       markers.py
+│   │   knowledge/
+│   │   │   __init__.py
+│   │       knowledge.py
+│   │   llm/
+│   │   │   __init__.py
+│   │   │   base.py
+│   │   │   factory.py
+│   │   │   ollama.py
+│   │       openai_compat.py
+│   │   prompts/
+│   │   │   __init__.py
+│   │       sections.py
+│   │   __init__.py
+│   │   __main__.py
+│   │   _yaml.py
+│   │   analyzer.py
+│   │   cache.py
+│   │   cli.py
+│   │   config.py
+│   │   configure.py
+│   │   digest.py
+│   │   errors.py
+│   │   learning_report.py
+│   │   profile.py
+│   │   report.py
+│   │   scanner.py
+│   │   templates.py
+│       web.py
+│   examples/
+│       demo-project/
+│       │   apr.yaml
+│       │   main.py
+│       │   README.md
+│           utils.py
+│   tests/
+│   │   __init__.py
+│   │   test_blindspot.py
+│   │   test_coach.py
+│   │   test_collab.py
+│   │   test_config.py
+│   │   test_configure.py
+│   │   test_digest.py
+│   │   test_event_bridge.py
+│   │   test_events.py
+│   │   test_fusion.py
+│   │   test_knowledge.py
+│   │   test_learning_report.py
+│   │   test_llm.py
+│   │   test_markers.py
+│   │
 
-材料共覆盖 **27 个有证据文件**，判定分布如下：
+---
 
-| 判定 | 文件数 | 在有证据文件中的占比 | 在全部扫描文件中的占比 |
-| --- | --- | --- | --- |
-| AI 主导 | 0 | 0.0% | 0.0% |
-| AI 辅助 | 3 | 11.1% | 4.3% |
-| 疑似人工 | 24 | 88.9% | 34.3% |
-| 证据不足 | 0 | 0.0% | 0.0% |
+## 核心代码分析
 
-有证据文件的平均 AI 贡献度为 **7%**，整体处于偏低水平。其余未列入证据清单的文件没有可用的 AI 参与证据，不纳入判定统计。
+以下分析仅基于项目画像中提供的内容摘录。`apr/cli.py` 与 `apr/config.py` 的摘录在关键处被截断，因此对未展示部分不做事后编造；对只能从 README、目录树或导入关系推断的内容，均明确标注为「推测」。
 
-### 证据表格
+### 1. `pyproject.toml`
 
-按 AI 贡献度从高到低排列：
+**职责**  
+定义项目的打包元数据、Python 版本约束、零第三方依赖以及命令行入口点。
 
-| 文件 | AI 贡献度 | 置信度 | 判定 |
-| --- | --- | --- | --- |
-| examples/demo-project/utils.py | 62% | 90% | AI 辅助 |
-| apr/evidence/markers.py | 53% | 65% | AI 辅助 |
-| tests/test_markers.py | 52% | 65% | AI 辅助 |
-| README.md | 27% | 72% | 疑似人工 |
-| apr/_yaml.py | 0% | 70% | 疑似人工 |
-| apr/analyzer.py | 0% | 60% | 疑似人工 |
-| apr/assessment/skill.py | 0% | 60% | 疑似人工 |
-| apr/cli.py | 0% | 75% | 疑似人工 |
-| apr/config.py | 0% | 50% | 疑似人工 |
-| apr/events/base.py | 0% | 50% | 疑似人工 |
-| apr/events/dsh.py | 0% | 50% | 疑似人工 |
-| apr/events/generic.py | 0% | 50% | 疑似人工 |
-| apr/knowledge/knowledge.py | 0% | 75% | 疑似人工 |
-| apr/profile.py | 0% | 50% | 疑似人工 |
-| apr/report.py | 0% | 70% | 疑似人工 |
-| apr/scanner.py | 0% | 50% | 疑似人工 |
-| apr/templates.py | 0% | 60% | 疑似人工 |
-| knowledge_graph-mindmap.md | 0% | 50% | 疑似人工 |
-| profile.yaml.example | 0% | 50% | 疑似人工 |
-| pyproject.toml | 0% | 60% | 疑似人工 |
-| tests/__init__.py | 0% | 50% | 疑似人工 |
-| tests/test_blindspot.py | 0% | 50% | 疑似人工 |
-| tests/test_config.py | 0% | 60% | 疑似人工 |
-| tests/test_events.py | 0% | 50% | 疑似人工 |
-| tests/test_knowledge.py | 0% | 75% | 疑似人工 |
+**关键实现**  
+- `[project]` 中声明 `dependencies = []`，与 README 所述「零第三方依赖，纯标准库实现」一致。
+- `requires-python = ">=3.10"` 明确最低 Python 版本。
+- `[project.scripts] apr = "apr.cli:main"` 将 `apr` 命令映射到 `apr/cli.py` 的 `main` 函数。
+- `[tool.setuptools] packages` 显式列出 `apr` 及其子包，避免自动发现遗漏。
 
-### AI 贡献度 ≥70% 的文件说明
+**设计模式/架构思想**  
+采用 PEP 621 声明式打包配置，显式包列表降低打包不确定性。零依赖策略适合 CLI 工具的分发，但代价是需要自行实现 YAML 解析、HTTP 调用等能力。
 
-**不存在 AI 贡献度 ≥70% 的文件。** 证据材料中没有任何文件被判定为「AI 主导」。
+**可改进点**  
+- 未声明 `license` 字段，虽然仓库根目录有 `LICENSE`，可在 `[project]` 中加入 `license = { file = "LICENSE" }`。
+- 缺少 `[project.optional-dependencies]` 或开发依赖组，测试依赖（如 pytest）无法通过 `pip install -e ".[dev]"` 一键安装。
+- `version = "0.1.0"` 为静态值，后续发布需要手动维护。
 
-整体证据库的最高 AI 贡献度为 `examples/demo-project/utils.py` 的 **62%**，属于「AI 辅助」层级。该项目不存在大块 AI 主导生成的源代码文件。
+### 2. `apr/cli.py`
 
-### 典型 AI 代码特征分析
+**职责**  
+CLI 入口，构造 `argparse` 解析器，定义 `review/scan/quiz/init/graph/plan/config` 等子命令，并统一处理 Windows 下的 UTF-8 输出。
 
-以下内容依据现有证据进行推测，**属于推测**：
+**关键实现**  
+- `_reconfigure_stdout()` 对 `sys.stdout` 和 `sys.stderr` 调用 `reconfigure(encoding="utf-8", errors="replace")`，避免中文报告在 Windows 控制台乱码。
+- `_add_llm_options(p)` 为多个子命令统一添加 `--provider/--model/--base-url/--api-key` 覆盖参数。
+- `build_parser()` 创建子命令，`review` 子命令参数最丰富：`--skip-quiz`、`--force-quiz`、`--quiz-count`、`--dry-run`、`--output`、`--language` 等。
+- 导入关系显示该模块依赖 `analyzer.run_review`、`digest.build_digest`、`llm.factory.create_provider`、`report.render_report`、`scanner.scan_project` 等。
+- 材料摘录止于 `p_config` 参数定义，未展示 `main` 函数与命令分发逻辑。
 
-1. **AI 参与的分布集中于示例与辅助文件，而非核心逻辑**。  
-   唯一具有明确 AI 生成标记的文件位于 `examples/demo-project/`，即示例项目中的工具函数。主包 `apr/` 下的核心模块（如 `cli.py`、`analyzer.py`、`report.py`、`scanner.py`）在 Git 证据中 AI 相关新增行占比均为 0%，首次提交均非 AI。
+**设计模式/架构思想**  
+典型的命令行门面模式：CLI 层只负责参数解析、配置加载、流程编排，具体业务由 `analyzer`、`scanner`、`report` 等模块完成。`_add_llm_options` 的抽取避免了参数定义重复。
 
-2. **推测：AI 被用于局部辅助或片段生成，而非整体生成**。  
-   在 `apr/evidence/markers.py` 与 `tests/test_markers.py` 中同时存在 AI 标记与人工标记，说明这些文件经过混合编辑，AI 生成的代码块与人工编写的内容并存。
+**可改进点**  
+- `_reconfigure_stdout` 使用 `errors="replace"` 会静默替换无法编码的字符，可能导致报告内容丢失；可考虑 `backslashreplace` 或仅对 Windows 启用。
+- `build_parser` 会随着子命令增加持续膨胀，可拆分为每个命令一个注册函数，例如 `_add_review_parser(sub)`、`_add_graph_parser(sub)` 等。
+- 材料未展示 `main` 中命令分发方式；若存在长串 `if command == "review": ...`，建议改为命令名到处理函数的字典映射（该点仅为假设，材料不足以确认）。
 
-3. **风格统一度与注释习惯无法从材料中充分判断**。  
-   材料未提供关键文件的代码摘录或注释样本，无法对风格统一度、注释密度、错误处理模式等做出有依据的观察。标记证据仅能说明 AI 参与的事实，不能推及具体风格特征。
+### 3. `apr/config.py`
 
-4. **推测：README.md 的 AI 标记与人工标记混合**，可能由 AI 生成初稿后经人工修改，或针对个别章节由 AI 辅助撰写。
+**职责**  
+加载并合并配置，定义 LLM、输出、限额、证据四类配置对象，从 YAML mapping 解析并读取环境变量。
 
-### 质量评估与人工复核清单
+**关键实现**  
+- 优先级链：内置默认 ← `~/.apr/apr.yaml` ← 项目根 `apr.yaml` ← 环境变量 ← CLI 参数；各配置文件按「节」整体覆盖，不做深合并。
+- `PROVIDER_DEFAULTS` 提供 `deepseek/openai/openai-compatible/ollama/mock` 五套预设，包含 `base_url`、`api_key_env`、`model`。
+- `LLMConfig.from_mapping` 根据 `provider` 查预设默认值，API key 从 `api_key_env` 对应的环境变量读取，并回退到 `APR_API_KEY`。
+- `OutputConfig.from_mapping` 对 `language` 做枚举校验，非法值抛 `ConfigError`。
+- `LimitsConfig.from_mapping` 校验 `
 
-**有证据的结论：**
+---
 
-- 该项目 AI 参与度较低，没有 AI 主导的文件。
-- 仅有 3 个文件被判定为 AI 辅助，且其中两个位于非核心路径（示例项目、测试）。
-- 唯一位于主包内的 AI 辅助文件为 `apr/evidence/markers.py`（贡献度 53%，置信度 65%），它本身负责检测代码中的 AI 生成标记，其中同时存在 AI 标记与人工标记。
+## AI 协作分析
 
-**人工应重点复核的文件清单：**
+> 本节分析你与 AI 如何共同完成这个项目（基于 Git / Agent 日志 / 代码标记证据，不是作弊检测，而是协作复盘）。
 
-| 优先等级 | 文件 | 复核要点 |
+本项目 AI 协作情况：
+
+**AI 参与比例**：
+
+| AI 代码生成 | AI 辅助修改 | 人工设计 |
 | --- | --- | --- |
-| 高 | apr/evidence/markers.py | AI 贡献度 53%，主包核心文件之一；需核对 AI 生成部分与人工部分的边界、标记判定逻辑是否会因自身混编而引入偏差 |
-| 高 | tests/test_markers.py | AI 贡献度 52%，与 `markers.py` 形成验证闭环；需确认测试是否能真实覆盖所有实现路径，避免 AI 生成测试与实现逻辑脱节 |
-| 中 | examples/demo-project/utils.py | AI 贡献度 62%、置信度 90%，虽然位于示例项目，但作为 AI 参与度最高的文件，建议检查函数行为是否符合示例项目预期 |
-| 中 | README.md | AI 贡献度 27%，存在 2 处 AI 标记与 2 处人工标记；需确认技术描述与实际实现的一致性 |
+| 0% | 10% | 90% |
 
-**推测：** 核心逻辑模块（`cli.py`、`analyzer.py`、`report.py`、`scanner.py` 等）无 AI 参与证据，说明项目主体由人工完成，AI 仅在小范围、低风险路径中起到辅助作用。
+**AI 主要用于**：
+
+- ✓ 代码生成（3 个文件由 AI 主导或辅助）
+
+**你的参与**：
+
+- 修改 AI 代码（3 个文件在 AI 基础上人工修改）
+- 自己设计模块（26 个文件判定人工编写）
+
+**你的优势**：
+
+- 能够修改和整合 AI 代码
+- 保持了较高的人工参与比例
+- 项目主体为独立设计
+
+**提升建议**：
+
+- 保持当前协作方式，定期复盘巩固。
 
 ---
 
@@ -176,7 +257,7 @@
 
 - **等级**：高风险盲区
 - **证据**：
-    - 项目核心依赖 REST API（2 个文件使用）
+    - 项目核心依赖 REST API（3 个文件使用）
     - 用户 profile 未掌握 REST API
     - 暂无 Quiz 验证
     - 代码以人工编写为主（AI 贡献 0%）
@@ -218,7 +299,7 @@
 
 - **等级**：中风险盲区
 - **证据**：
-    - 项目核心依赖 MySQL（2 个文件使用）
+    - 项目核心依赖 MySQL（3 个文件使用）
     - profile 标注正在学习
     - 暂无 Quiz 验证
     - 代码以人工编写为主（AI 贡献 0%）
@@ -330,7 +411,7 @@
 
 - **等级**：中风险盲区
 - **证据**：
-    - 项目核心依赖 Redis（5 个文件使用）
+    - 项目核心依赖 Redis（7 个文件使用）
     - 学习目标（优先级 medium）
     - 暂无 Quiz 验证
     - 代码以人工编写为主（AI 贡献 0%）
@@ -344,7 +425,7 @@
 
 - **等级**：中风险盲区
 - **证据**：
-    - 项目核心依赖 Python（60 个文件使用）
+    - 项目核心依赖 Python（65 个文件使用）
     - profile 自评 basic
     - 暂无 Quiz 验证
     - 代码以人工编写为主（AI 贡献 7%）
@@ -384,41 +465,123 @@
 
 ---
 
+## 面试问题
 
+### 基础
+
+**1. 题目**：在 `apr/config.py` 中，配置加载的优先级顺序是什么？这种设计有什么好处？  
+- **考察点**：配置管理、多层配置合并机制。  
+- **参考回答要点**：  
+  - 优先级从低到高：内置默认值 → `~/.apr/apr.yaml`（全局）→ 项目根目录 `apr.yaml`（项目级）→ 环境变量 → CLI 参数。  
+  - 各配置文件按“节”整体覆盖，不做深合并（例如 `llm` 节整体替换）。  
+  - 好处：允许用户设置全局偏好，项目可覆盖，命令行临时调整最高优先级，灵活且可预测。  
+  - 环境变量（如 `DEEPSEEK_API_KEY`）在加载 LLM 配置时直接读取，避免密钥硬编码。
+
+**2. 题目**：项目宣称“零第三方依赖”，它如何实现 YAML 解析？这样做有什么代价？  
+- **考察点**：对自研解析器的理解、依赖取舍。  
+- **参考回答要点**：  
+  - 在 `apr/_yaml.py` 中实现了一个简化 YAML 解析器，标准库纯 Python。  
+  - 只支持项目所需的简单结构（如键值对、列表、嵌套字典等）。  
+  - 代价：无法处理复杂 YAML 特性（如锚点、多行字符串、类型标签等），容错性较弱。  
+  - 好处：安装门槛极低（`pip install -e .` 无额外依赖），部署简单。
+
+**3. 题目**：`apr/cli.py` 中通过 `argparse` 定义了哪些子命令？请列举并说明各自功能。  
+- **考察点**：对 CLI 设计及项目功能的整体把握。  
+- **参考回答要点**：  
+  - `review`：生成复盘报告（默认 `README复盘.md`），支持 `--skip-quiz`、`--language` 等参数。  
+  - `scan`：只扫描项目并预览技术栈，不调用 LLM。  
+  - `graph`：生成知识图谱（JSON/HTML/Canvas/Mindmap）。  
+  - `plan`：生成个性化学习计划 `learning_plan.json`（不调用 LLM）。  
+  - `quiz`：只运行实践验证问答。  
+  - `init`：生成 `apr.yaml` 与 `profile.yaml` 模板。  
+  - `web`：启动 Web 界面（`http://127.0.0.1:8765`）。  
+  - `config`：交互式或子命令方式切换 LLM 供应商/模型。
+
+**4. 题目**：README 中描述的多源证据融合权重分别是多少？AI 贡献度的判定阈值是什么？  
+- **考察点**：对证据引擎核心规则的理解。  
+- **参考回答要点**：  
+  - 代码标记权重 1.0（`# AI-GENERATED` / `# HAND-WRITTEN`）。  
+  - Agent 日志权重 0.9（Claude Code / DSH / 手动导入）。  
+  - Git 历史权重 0.8（作者、Co-authored-by、新增行占比）。  
+  - 变更轨迹权重 0.8（Agent 编辑事件与 Git numstat）。  
+  - 判定：AI 贡献度 ≥ 70% 为“AI 主导”，40%–70% 为“AI 辅助”，置信度 < 30% 为“证据不足”。
+
+**5. 题目**：`apr/config.py` 的 `PROVIDER_DEFAULTS` 支持哪些 LLM 提供商？如何快速切换预设？  
+- **考察点**：多提供商配置机制。  
+- **参考回答要点**：  
+  - 支持 `deepseek`、`openai`、`openai-compatible`、`ollama`、`mock`。  
+  - 每个预设包含 `base_url`、`api_key_env`、`model` 等字段。  
+  - 通过 `apr config set --preset deepseek-flash` 一键切换（写全局配置）。  
+  - 使用 `--local` 参数可只写当前项目配置；`apr config show` 查看当前生效配置。
+
+### 进阶
+
+**6. 题目**：`apr/evidence/fusion.py` 负责多源证据融合，请推测其可能的工作流程，并说明当不同证据源结论冲突时可能如何处理？  
+- **考察点**：证据融合算法设计、冲突处理策略。  
+- **参考回答要点**：  
+  - 推测流程：从各证据源获取文件级贡献度，按权重加权求和得到综合 AI 贡献度。  
+  - 同时结合置信度信息（如证据源覆盖度、标记强度）决定最终置信度。  
+  - 冲突处理：可能采用高权重证据优先原则，或取加权结果并降低置信度。  
+  - 最终报告严格区分“有证据的结论”与“推测”，证据不足时明确标注。
+
+**7. 题目**：`apr/events/` 目录下包含 `base.py`、`dsh.py`、`generic.py`，请解释统一 Agent Event 系统的设计目的，以及如何桥接进证据层。  
+- **考察点**：适配器模式、事件驱动架构。  
+- **参考回答要点**：  
+  - 定义规范事件基类（`base.py`），各适配器将不同格式日志（DSH JSONL、通用 JSONL）转为统一事件结构。  
+  - 证据层只依赖规范事件接口，不关心来源格式，降低耦合。  
+  - 桥接方式：事件经适配器解析后进入证据层，与 Git 历史、代码标记等一起融合计算 AI 贡献度。  
+  - 扩展新来源只需新增适配器，无需改动 fusion 核心逻辑（推测）。
+
+**8. 题目**：知识图谱的四层结构是“文件 → 技术 → 知识点 → 技能”，请解释各层含义以及“AI 贡献徽标”的作用。  
+- **考察点**：知识图谱建模、学习评估可视化。  
+- **参考回答要点**：  
+  - 文件节点通过 `uses` 关系指向技术节点，技术通过 `covers` 关系指向知识点，知识点通过 `assesses` 关系评估用户技能。  
+  - 技能节点带掌握程度百分比（来自 `profile.yaml`）。  
+  - 文件节点和技术节点带 AI 贡献徽标，可直观看出哪些技术/文件主要由 AI 完成。  
+  - 作用：识别“纸面掌握”——即 AI 贡献高但用户技能评估低的项目，帮助定位真实盲区。
+
+**9. 题目**：`apr/coach/planner.py` 实现 Learning Coach，为什么设计为纯确定性规划器而不调用 LLM？这种设计的优缺点是什么？  
+- **考察点**：架构决策、确定性 vs 生成式。  
+- **参考回答要点**：  
+  - 优点：速度极快（`apr plan` 几秒出结果）、结果可复现、无 API 成本、无网络依赖。  
+  - 基于五类数据（项目需求、技能档案、Quiz、AI 贡献、知识图谱）按规则计算优先级。  
+  - 缺点：无法理解复杂语义或生成个性化建议，只能依赖预定义规则。  
+  - 适用于学习计划这种结构化输出场景，LLM 更适合生成自然语言报告内容。
+
+**10. 题目**：项目在 `apr/cache.py` 和 `LimitsConfig` 中实现了哪些工程保护措施？它们分别解决什么问题？  
+- **考察点**：缓存机制、资源保护。  
+- **参考回答要点**：  
+  - `cache.py` 实现结果缓存，避免重复调用 LLM，节省时间与费用。  
+  - `LimitsConfig` 限制扫描文件数（`max_files=300`）、单文件大小（`max_file_kb=200`）、总大小（`max_total_kb=2000`）等。  
+  - 额外忽略规则（`extra_ignores`）与 `.gitignore` 配合，防止扫描无关大文件（如 `node_modules`）。  
+  - 这些措施保证工具在大型项目上也能稳定运行，避免资源耗尽。
+
+### 开放
+
+**11. 题目**：多源证据体系（代码标记、Agent 日志、Git 历史、变更轨迹）对 AI 贡献度的判定是否可靠？你认为有哪些潜在漏洞或改进方向？  
+- **考察点**：批判性思维、证据可靠性评估。  
+- **参考回答要点**：  
+  - 现有信号可能遗漏无标记的 AI 生成代码（例如开发者手动复制 AI 输出且未加注释）。
 
 ---
 
 ## 下一步练习
 
-> 说明：以下练习基于项目当前目录结构与文件命名设计。由于未读取源码内容，凡涉及“现有模块是否已具备某接口”“CLI 命令格式”等判断均为推测，动手前应先阅读对应文件确认。测试运行命令基于项目使用 pytest 的推测，若 `pyproject.toml` 中配置了其他 runner，以项目实际配置为准。
+以下练习基于当前项目结构与测试覆盖情况设计，按由易到难排序。练习 3 专门用于补齐“学习盲区”中的高优先级盲区；由于材料未给出“学习盲区”章节原文，该盲区基于 `tests/` 目录缺失 `test_git.py` 这一可见事实进行推测，并在任务中标注。
 
-### 练习 1：跑通最小分析流程（预计难度：★☆☆☆☆）
+### 练习 1：跑通现有测试并阅读测试命名约定
 
-**任务描述**  
-在 `examples/demo-project` 上运行一次完整分析，产出报告。阅读 `apr/cli.py`、`apr/analyzer.py`、`apr/report.py` 的调用链，画出从项目扫描到报告生成的数据流草图。
+- **难度：★**
+- **任务描述**：在项目根目录运行 `pytest -q`，确认全部现有测试通过。然后阅读 `tests/test_config.py`、`tests/test_scanner.py`，理解项目如何组织测试文件、如何构造 fixture 以及如何模拟外部依赖。
+- **涉及文件/技术**：`pytest`、`tests/` 目录下全部 `test_*.py`、`pyproject.toml`
+- **完成标准**：`pytest -q` 无失败；能口头或书面说明至少 3 个测试文件分别覆盖的模块，以及其中 1 个 fixture 的用途。
 
-**涉及文件/技术**  
-`examples/demo-project/apr.yaml`、`examples/demo-project/main.py`、`apr/cli.py`、`apr/analyzer.py`、`apr/report.py`、`README.md`
+### 练习 2：对示例项目完成一次端到端分析
 
-**完成标准**  
-- 能无报错完成一次示例项目分析并生成报告文件。  
-- 命令格式以 `README.md` 为准，若未文档化，则使用推测命令 `python -m apr analyze examples/demo-project` 并验证。  
-- 数据流草图中能标出 `scanner → evidence → analyzer → report` 的主链路。
-
-### 练习 2：为扫描排除规则补充测试（预计难度：★★☆☆☆）
-
-**任务描述**  
-项目画像显示扫描过程中排除了 19 项内容。阅读 `apr/scanner.py` 与 `tests/test_scanner.py`，为扫描器的排除逻辑补充边界测试，例如大写扩展名、隐藏目录、超大文件、符号链接等场景。若测试中发现某排除规则未实现或行为不符合预期，先补实现再补测试。
-
-**涉及文件/技术**  
-`apr/scanner.py`、`tests/test_scanner.py`、`.gitignore`
-
-**完成标准**  
-- `pytest tests/test_scanner.py -q` 通过。  
-- 新增至少 3 个扫描排除相关测试用例，且能清晰验证排除逻辑。  
-- 不依赖真实外部路径，使用 `tmp_path` 构造临时目录。
-
-### 练习 3：增强配置文件的
+- **难度：★★**
+- **任务描述**：先查看 `apr/cli.py` 的参数说明，然后使用 CLI 对 `examples/demo-project` 运行一次完整分析，生成报告。观察报告中哪些章节有实际内容，哪些章节为空或缺失，并记录从扫描到报告输出的关键步骤。
+- **涉及文件/技术**：`apr/cli.py`、`apr/analyzer.py`、`apr/report.py`、`examples/demo-project/apr.yaml`、`apr/config.py`
+- **完成标准**：成功生成至少一份报告（控制台或文件）；能用自己的话复述“扫描 → 提取证据 → 生成报告”的主流程，并指出示例项目中哪一部分
 
 ---
 
@@ -428,7 +591,7 @@
 
 - **自评**：beginner
 - **项目证据**：
-    - 使用 Python 编写 60 个文件
+    - 使用 Python 编写 65 个文件
 - **Quiz 表现**：未验证
 - **最终等级**：入门（beginner）
 - **可信度**：90%
@@ -587,7 +750,7 @@
 ### REST API
 
 **原因**：
-- 项目使用REST API
+- 项目大量使用REST API
 - 技能档案尚未掌握
 
 **学习路线**：
@@ -620,7 +783,7 @@
 ### MySQL
 
 **原因**：
-- 项目使用MySQL
+- 项目大量使用MySQL
 - 正在学习中
 - 用户技能等级 入门
 
@@ -758,7 +921,7 @@
 | --- | --- |
 | AI 主导 | 0 |
 | AI 辅助 | 3 |
-| 疑似人工 | 24 |
+| 疑似人工 | 26 |
 | 证据不足 | 0 |
 
 **有证据文件的平均 AI 贡献度**：7%
@@ -770,49 +933,32 @@
 | examples/demo-project/utils.py | 62% | 90% | AI 辅助 | [marker] 检测到 1 处 AI 生成标记，如：# AI-GENERATED: 此函数由 Claude 编写 |
 | apr/evidence/markers.py | 53% | 65% | AI 辅助 | [marker] 同时存在 AI 标记(2)与人工标记(4) |
 | tests/test_markers.py | 52% | 65% | AI 辅助 | [marker] 同时存在 AI 标记(1)与人工标记(1) |
-| README.md | 27% | 72% | 疑似人工 | [marker] 同时存在 AI 标记(2)与人工标记(2)；[git] @2026-08-14 0/5 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| README.md | 27% | 72% | 疑似人工 | [marker] 同时存在 AI 标记(2)与人工标记(2)；[git] @2026-08-14 0/7 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/_yaml.py | 0% | 70% | 疑似人工 | [git] @2026-08-14 0/4 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/analyzer.py | 0% | 60% | 疑似人工 | [git] @2026-08-14 0/3 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/assessment/skill.py | 0% | 60% | 疑似人工 | [git] @2026-08-15 0/3 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
-| apr/cli.py | 0% | 75% | 疑似人工 | [git] @2026-08-14 0/7 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| apr/cli.py | 0% | 75% | 疑似人工 | [git] @2026-08-14 0/9 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/config.py | 0% | 50% | 疑似人工 | [git] @2026-08-14 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/events/base.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/events/dsh.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/events/generic.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
-| apr/knowledge/knowledge.py | 0% | 75% | 疑似人工 | [git] @2026-08-15 0/6 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| apr/evidence/agent_logs.py | 0% | 50% | 疑似人工 | [git] @2026-08-14 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| apr/knowledge/knowledge.py | 0% | 75% | 疑似人工 | [git] @2026-08-15 0/7 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/profile.py | 0% | 50% | 疑似人工 | [git] @2026-08-14 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/report.py | 0% | 70% | 疑似人工 | [git] @2026-08-14 0/4 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
-| apr/scanner.py | 0% | 50% | 疑似人工 | [git] @2026-08-14 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| apr/scanner.py | 0% | 60% | 疑似人工 | [git] @2026-08-14 0/3 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | apr/templates.py | 0% | 60% | 疑似人工 | [git] @2026-08-14 0/3 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
-| knowledge_graph-mindmap.md | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| knowledge_graph-mindmap.md | 0% | 60% | 疑似人工 | [git] @2026-08-15 0/3 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | profile.yaml.example | 0% | 50% | 疑似人工 | [git] @2026-08-14 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | pyproject.toml | 0% | 60% | 疑似人工 | [git] @2026-08-14 0/3 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
-| tests/__init__.py | 0% | 50% | 疑似人工 | [git] @2026-08-14 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| tests/__init__.py | 0% | 70% | 疑似人工 | [git] @2026-08-14 0/4 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | tests/test_blindspot.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| tests/test_coach.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | tests/test_config.py | 0% | 60% | 疑似人工 | [git] @2026-08-14 0/3 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | tests/test_events.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
-| tests/test_knowledge.py | 0% | 75% | 疑似人工 | [git] @2026-08-15 0/5 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
+| tests/test_knowledge.py | 0% | 75% | 疑似人工 | [git] @2026-08-15 0/6 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | tests/test_report.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
 | tests/test_skill.py | 0% | 50% | 疑似人工 | [git] @2026-08-15 0/2 次提交疑似 AI 参与，AI 相关新增行占比 0%，首次提交非 AI |
-
----
-
-## 附录 B：实践验证记录
-
-### 作答记录
-
-| 题目 | 我的答案 | 得分 | 点评 |
-| --- | --- | --- | --- |
-| 根据项目画像中的技术栈检测，本项目主要使用哪种编程语言实现？ | Python（参考：Python） | 100 | 回答正确，技术栈识别准确。 |
-| apr/llm/ 目录下包含 factory.py、ollama.py 和 openai_compat.py，这说明项目 | Ollama 与 OpenAI 兼容 API（参考：Ollama 与 OpenAI 兼容 API） | 100 | 回答正确，LLM 后端支持识别准确。 |
-| 在 apr/evidence/ 中，fusion.py 最可能负责什么职责？ | 融合多个证据来源形成统一评审依据（参考：融合多个证据来源形成统一评审依据） | 100 | 回答正确，fusion.py 职责理解准确。 |
-| apr/events/ 下同时存在 base.py、dsh.py 和 generic.py，这种结构最可能体现什么架构意 | 提供统一事件抽象并适配 dsh 与通用事件源（参考：提供统一事件抽象并适配 dsh 与通用事件源） | 100 | 回答正确，事件抽象与多源适配架构理解准确。 |
-
-**简答题回答**：不清楚
-
-**总体评分**：80/100
-
-**薄弱主题**：架构决策
 
 ---
 
