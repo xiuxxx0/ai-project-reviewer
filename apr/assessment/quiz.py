@@ -60,6 +60,19 @@ class QuizResult:
         return "\n".join(lines)
 
 
+def _complete_json_retry(llm: LLMProvider, system: str, user: str,
+                             max_tokens: int = 8192):
+    """JSON 输出 + 解析失败时纠错重试一次（推理模型思考过程可能截断 JSON）。"""
+    messages = [ChatMessage("system", system), ChatMessage("user", user)]
+    try:
+        return llm.complete_json(messages, max_tokens=max_tokens)
+    except LLMError:
+        messages.append(ChatMessage("assistant", "（上一次输出不是合法 JSON）"))
+        messages.append(ChatMessage(
+            "user", "请只输出符合要求的 JSON，不要任何额外文字、不要截断。"))
+        return llm.complete_json(messages, max_tokens=max_tokens)
+
+
 def generate_questions(llm: LLMProvider, digest_text: str, count: int) -> tuple[list[Question], str]:
     system = (
         "[TASK: quiz-generate]\n"
@@ -76,7 +89,7 @@ def generate_questions(llm: LLMProvider, digest_text: str, count: int) -> tuple[
         + '"answer_index": 0, "explanation": "解析", "topic": "主题"}], "essay": "简答题题目"}\n'
         + "只输出 JSON，不要其他文字。"
     )
-    data = llm.complete_json([ChatMessage("system", system), ChatMessage("user", user)])
+    data = _complete_json_retry(llm, system, user)
     questions = []
     for q in (data.get("questions") or [])[:count]:
         try:
@@ -153,7 +166,7 @@ def grade_answers(llm: LLMProvider, questions: list[Question], answers: list[str
         + '"overall": 80, "weakest_topics": ["主题"]}\n'
         + "overall 为加权总分（选择题 80% + 简答 20%，未答按 0 分）。只输出 JSON。"
     )
-    data = llm.complete_json([ChatMessage("system", system), ChatMessage("user", user)])
+    data = _complete_json_retry(llm, system, user, max_tokens=4096)
     items = data.get("items") or []
     overall = int(data.get("overall") or 0)
     weakest = [str(t) for t in (data.get("weakest_topics") or [])]
