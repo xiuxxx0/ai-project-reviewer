@@ -4,9 +4,10 @@
 - 注释（# 开头或行内）
 - 嵌套映射（空格缩进）
 - 标量列表（- item，归属其上方最近的键）
+- 映射列表（- key: value 及其缩进后续键，如 profile.yaml 的 skills）
 - 标量值：字符串 / 整数 / 浮点数 / true|false|null / []
 
-不支持：锚点、多行字符串、流式集合（{...}）、引号内转义。
+不支持：锚点、多行字符串、流式集合（{...}）、引号内转义、无缩进列表。
 """
 from __future__ import annotations
 
@@ -36,18 +37,8 @@ def _scalar(text: str):
 
 
 def parse_simple_yaml(text: str) -> dict:
-    """解析简化 YAML。
-
-    stack 条目为 (父容器, 键所在行缩进, 链接键)：
-    链接键 = 父容器中指向当前嵌套上下文的那个键。
-    """
-    root: dict = {}
-    stack: list[tuple[dict, int, str]] = []
-    cur: dict = root
-    cur_indent = -1
-    last_key: str | None = None
-    active_list: list | None = None
-
+    """解析简化 YAML（递归下降：映射、标量列表、映射列表）。"""
+    entries: list[tuple[int, str]] = []
     for raw in text.splitlines():
         if not raw.strip() or raw.lstrip().startswith("#"):
             continue
@@ -57,52 +48,79 @@ def parse_simple_yaml(text: str) -> dict:
             line = line.split("#", 1)[0].rstrip()
         if not line:
             continue
+        entries.append((indent, line))
+    if not entries:
+        return {}
 
-        is_item = line.startswith("- ")
-        if not is_item:
-            active_list = None
+    def parse_block(index: int, min_indent: int):
+        """解析一个块。返回 (值, 下一个待处理下标)。"""
+        if index >= len(entries):
+            return {}, index
+        indent, line = entries[index]
 
-        if is_item:
-            value = _scalar(line[2:].strip().strip("\"'").strip())
-            if active_list is not None:
-                active_list.append(value)
-                continue
-            # 列表项归属：优先查找“刚创建的占位 dict 的父级键”
-            if isinstance(cur, dict) and not cur and stack:
-                parent, p_indent, link_key = stack[-1]
-                if isinstance(parent, dict) and link_key in parent and parent[link_key] is cur:
-                    active_list = [value]
-                    parent[link_key] = active_list
-                    cur, cur_indent, last_key = parent, p_indent, link_key
-                    continue
-            if isinstance(cur, dict) and last_key is not None:
-                holder = cur.get(last_key)
-                if isinstance(holder, list):
-                    holder.append(value)
-                    active_list = holder
+        if line.startswith("- "):
+            items: list = []
+            while (index < len(entries) and entries[index][0] == indent
+                   and entries[index][1].startswith("- ")):
+                _, item_line = entries[index]
+                rest = item_line[2:].strip()
+                if ":" in rest:
+                    # 映射列表项：首个键与 - 同行，其余键缩进对齐
+                    key, _, val = rest.partition(":")
+                    key = key.strip().strip("\"'")
+                    val = val.strip()
+                    item: dict = {}
+                    index += 1
+                    if val:
+                        item[key] = _scalar(val.strip("\"'"))
+                    else:
+                        if index < len(entries) and entries[index][0] > indent:
+                            sub, index = parse_block(index, entries[index][0])
+                            item[key] = sub
+                        else:
+                            item[key] = {}
+                    while (index < len(entries) and entries[index][0] > indent
+                           and not entries[index][1].startswith("- ")):
+                        k, _, v = entries[index][1].partition(":")
+                        k = k.strip().strip("\"'")
+                        v = v.strip()
+                        prev_indent = entries[index][0]
+                        index += 1
+                        if v:
+                            item[k] = _scalar(v.strip("\"'"))
+                        else:
+                            if index < len(entries) and entries[index][0] > prev_indent:
+                                sub, index = parse_block(index, entries[index][0])
+                                item[k] = sub
+                            else:
+                                item[k] = {}
+                    items.append(item)
                 else:
-                    active_list = [value]
-                    cur[last_key] = active_list
-            continue
+                    items.append(_scalar(rest.strip("\"'")))
+                    index += 1
+            return items, index
 
-        # 回退层级：新行缩进不超过栈顶键的缩进 → 回到其父容器
-        while stack and indent <= stack[-1][1]:
-            parent, p_indent, link_key = stack.pop()
-            cur, cur_indent, last_key = parent, p_indent, link_key
-
-        if ":" in line:
-            key, _, val = line.partition(":")
+        # 映射
+        result: dict = {}
+        while (index < len(entries) and entries[index][0] >= min_indent
+               and not entries[index][1].startswith("- ")):
+            i2, line2 = entries[index]
+            key, _, val = line2.partition(":")
             key = key.strip().strip("\"'")
             val = val.strip()
-            if val == "":
-                child: dict = {}
-                cur[key] = child
-                stack.append((cur, indent, key))
-                cur, cur_indent, last_key = child, indent, None
+            index += 1
+            if val:
+                result[key] = _scalar(val.strip("\"'"))
             else:
-                cur[key] = _scalar(val.strip("\"'"))
-                last_key = key
-    return root
+                if index < len(entries) and entries[index][0] > i2:
+                    sub, index = parse_block(index, entries[index][0])
+                    result[key] = sub
+                else:
+                    result[key] = {}
+        return result, index
+
+    value, _ = parse_block(0, entries[0][0])
+    return value if isinstance(value, dict) else {}
 
 
 def _dump_scalar(value) -> str:
@@ -130,7 +148,15 @@ def dump_simple_yaml(data: dict, _indent: int = 0) -> str:
         elif isinstance(value, list):
             lines.append(f"{pad}{k}:")
             for item in value:
-                lines.append(f"{pad}  - {_dump_scalar(item)}")
+                if isinstance(item, dict) and item:
+                    # 续行必须比 "- " 更深一级，才能被解析器识别为同一映射项
+                    sub = dump_simple_yaml(item, _indent + 2)
+                    first, _, rest = sub.partition("\n")
+                    lines.append(pad + "  - " + first.strip())
+                    if rest:
+                        lines.append(rest)
+                else:
+                    lines.append(f"{pad}  - {_dump_scalar(item)}")
         else:
             lines.append(f"{pad}{k}: {_dump_scalar(value)}")
     return "\n".join(lines)

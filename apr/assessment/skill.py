@@ -31,10 +31,18 @@ LEVEL_LABELS = {"beginner": "入门", "intermediate": "掌握", "advanced": "熟
 
 _LEVEL_ALIASES = {
     "初级": "beginner", "入门": "beginner", "beginner": "beginner", "novice": "beginner",
+    "basic": "beginner", "了解": "beginner",
     "中级": "intermediate", "intermediate": "intermediate",
     "高级": "advanced", "advanced": "advanced",
     "专家": "expert", "expert": "expert", "精通": "expert",
 }
+
+
+def _normalize_level(level: str | None) -> str | None:
+    """等级归一化：basic→beginner、中文别名→英文标准等级。"""
+    if not level:
+        return None
+    return _LEVEL_ALIASES.get(str(level).strip().lower())
 
 # 作为平台标签出现但不构成独立技能项的噪声标签
 _SKIP_PLATFORMS = {"文档"}
@@ -243,14 +251,45 @@ def _confidence(claimed: str | None, files: int, used: bool, quiz_score: int | N
 
 def _collect_skills(profile: Profile | None, scan: ScanResult | None,
                     quiz: QuizResult | None) -> dict:
-    """技能集合与元信息：{技能名: {claimed, files, used}}。"""
+    """技能集合与元信息：{技能名: {claimed, files, used, learning, topics, priority}}。"""
     skills: dict = {}
+
+    def entry_for(name: str) -> dict:
+        return skills.setdefault(name, {"claimed": None, "files": 0, "used": False,
+                                        "learning": False, "topics": [], "priority": ""})
+
     if profile is not None:
+        # 新格式：mastered / learning 条目（带 level 与 topics）
+        for claim in profile.mastered:
+            name = str(claim.name).strip()
+            if not name:
+                continue
+            entry = entry_for(name)
+            if _normalize_level(claim.level):
+                entry["claimed"] = _normalize_level(claim.level)
+            entry["topics"] = [str(t) for t in claim.topics if t]
+        for claim in profile.learning:
+            name = str(claim.name).strip()
+            if not name:
+                continue
+            entry = entry_for(name)
+            if _normalize_level(claim.level):
+                entry["claimed"] = _normalize_level(claim.level)
+            entry["learning"] = True
+            entry["topics"] = [str(t) for t in claim.topics if t]
+        # 新格式：target 目标条目（无自评，只有优先级）
+        for target in profile.targets:
+            name = str(target.name).strip()
+            if not name:
+                continue
+            entry = entry_for(name)
+            entry["priority"] = str(target.priority or "")
+        # 旧格式：known_skills 字符串（可带内联等级）
         for raw in profile.known_skills:
             name, level = _parse_claimed(str(raw))
             if not name:
                 continue
-            entry = skills.setdefault(name, {"claimed": None, "files": 0, "used": False})
+            entry = entry_for(name)
             if level:
                 entry["claimed"] = level
     if scan is not None:
@@ -300,9 +339,15 @@ def assess_skills(profile: Profile | None = None,
 
         claimed = meta["claimed"]
         if claimed:
-            evidence_lines.append(f"技能档案声明掌握（{claimed}）")
-        elif profile is not None and profile.known_skills:
+            evidence_lines.append(f"技能档案自评（{claimed}）")
+        elif profile is not None and (profile.known_skills or profile.mastered or profile.learning):
             evidence_lines.append("技能档案未声明")
+        if meta.get("learning"):
+            evidence_lines.append("档案标注：正在学习")
+        if meta.get("topics"):
+            evidence_lines.append("档案关注主题：" + "、".join(meta["topics"]))
+        if meta.get("priority"):
+            evidence_lines.append(f"学习目标（优先级 {meta['priority']}）")
 
         project_lines: list[str] = []
         if files:

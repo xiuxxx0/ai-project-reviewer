@@ -6,7 +6,7 @@ from apr.assessment.quiz import Question, QuizResult
 from apr.assessment.skill import (LEVELS, SkillAssessment, SkillAssessmentEntry,
                                   assess_skills)
 from apr.evidence.base import EvidenceReport, FileVerdict
-from apr.profile import Profile
+from apr.profile import Profile, SkillClaim, TargetSkill
 from apr.scanner import FileInfo, ScanResult
 
 
@@ -125,6 +125,21 @@ class SkillTest(unittest.TestCase):
         weak = [e.skill for e in result.weakest()]
         self.assertIn("Rust", weak)
         self.assertNotIn("Python", weak)
+
+    def test_new_profile_format_claims(self):
+        profile = Profile(
+            mastered=[SkillClaim("Python", "basic", ["函数", "文件"])],
+            learning=[SkillClaim("Java", "beginner", ["面向对象"])],
+            targets=[TargetSkill("Redis", "high")])
+        result = assess_skills(profile, _scan(PY_FILES), None, None)
+        python = result.entries["Python"]
+        self.assertEqual(python.claimed_level, "beginner")  # basic → beginner
+        self.assertTrue(any("关注主题" in ev for ev in python.evidence))
+        java = result.entries["Java"]
+        self.assertTrue(any("正在学习" in ev for ev in java.evidence))
+        redis = result.entries["Redis"]
+        self.assertTrue(any("优先级 high" in ev for ev in redis.evidence))
+        self.assertIsNone(redis.claimed_level)
 
     def test_noise_skills_filtered(self):
         scan = _scan([("a.py", ".py"), ("b.toml", ".toml"), ("c.yaml", ".yaml"),

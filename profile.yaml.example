@@ -1,8 +1,46 @@
-# 个人技能档案 —— 用于「我的学习盲区」板块
-name: 你的名字            # 可选
-background: 一句话介绍你的技术背景   # 可选
-known_skills:             # 已掌握的技术/领域
-  - Python
-  - Git
-learning_goals:           # 想提升的方向
-  - 系统设计
+# profile.yaml —— 自我技能档案（不是最终能力评估）
+# RepoCourse 会结合项目分析、Agent 行为、Quiz 结果动态修正。
+
+profile:
+  name: "你的名字"
+  role: "你的角色/身份"
+  goal:
+    - "你的职业/学习目标"
+
+skills:
+  # 已掌握，至少可以独立使用
+  mastered:
+    - name: "Python"
+      level: "basic"        # basic|beginner|intermediate|advanced|expert（或 入门/中级/高级/专家）
+      topics:
+        - "基础语法"
+        - "函数"
+    - name: "Git"
+      level: "basic"
+
+  # 正在学习，希望通过项目提升
+  learning:
+    - name: "Java"
+      level: "beginner"
+      topics:
+        - "面向对象"
+        - "集合"
+
+  # 想学习，但目前还没有系统掌握
+  target:
+    - name: "Redis"
+      priority: "medium"    # high | medium | low
+
+learning_preferences:
+  project_based: true
+  prefer_practice: true
+  prefer_explanation_before_practice: true
+  prefer_chinese: true
+
+# 兼容旧版扁平格式（可省略上面整个结构，直接用下面写法）：
+# name: 你的名字
+# background: 一句话介绍
+# known_skills:
+#   - Python: intermediate
+# learning_goals:
+#   - 系统设计
