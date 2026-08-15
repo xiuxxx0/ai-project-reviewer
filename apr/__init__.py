@@ -1,7 +1,10 @@
-"""AI Project Reviewer（AI 项目复盘助手）。
+"""AI Project Reviewer（AI 项目复盘助手 / RepoCourse）。
 
-输入一个代码项目，输出一份结构化的《README复盘.md》：
-项目介绍 / 技术栈 / 项目结构 / 核心代码分析 / AI 生成部分（多源证据）/
-我的学习盲区 / 面试问题 / 下一步练习。
+输入一个代码项目，输出：技术复盘报告 + 学习成长报告 + 知识图谱 + 学习计划。
 """
-__version__ = "0.1.0"
+try:
+    from importlib.metadata import PackageNotFoundError, version as _pkg_version
+    __version__ = _pkg_version("repocourse")
+except (PackageNotFoundError, ImportError):
+    __version__ = "0.1.2"
+
