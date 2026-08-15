@@ -9,3 +9,4 @@ build/
 .coverage
 .test-tmp/
 profile.yaml
+.idea/
