@@ -63,7 +63,7 @@ class BlindSpotTest(unittest.TestCase):
         self.assertIn("Quiz 40 分", joined)
         self.assertIn("主要由 AI 生成", joined)
         joined_sug = "\n".join(redis.suggestions)
-        self.assertIn("学习缓存基础", joined_sug)
+        self.assertIn("学习 缓存 基础", joined_sug)
         self.assertIn("独立重写", joined_sug)
 
     def test_mastered_and_good_quiz_not_blind(self):
@@ -75,7 +75,7 @@ class BlindSpotTest(unittest.TestCase):
         report = detect_blind_spots(profile=profile, scan=scan, digest=digest,
                                     quiz=quiz, evidence=evidence)
         self.assertNotIn("Python", {b.skill for b in report.items})
-        self.assertTrue(any("掌握良好" in n for n in report.notes))
+        self.assertTrue(any("风险低" in n and "Python" in n for n in report.notes))
 
     def test_learning_status_evidence(self):
         root, scan, digest = _project()
