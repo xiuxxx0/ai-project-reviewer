@@ -274,19 +274,78 @@ apr review .
 项目根目录 apr.yaml（可用 apr init 生成），环境变量可覆盖：
 APR_PROVIDER、APR_MODEL、APR_BASE_URL、APR_API_KEY。
 
-## 模块地图
+## 技术架构
 
-    apr/
-    ├── scanner.py        项目扫描（.gitignore 语义、二进制检测、限额）
-    ├── digest.py         项目画像（技术栈检测、关键文件、token 预算）
-    ├── evidence/         多源证据采集与融合（Git / Agent 日志 / 标记）
-    ├── events/           统一 Agent Event 系统（dsh / generic 适配器）
-    ├── llm/              多供应商 LLM 抽象（DeepSeek/OpenAI/Ollama/mock）
-    ├── assessment/       quiz 问答 / skill 技能评估 / blindspot 盲区证据引擎
-    ├── knowledge/        知识图谱（构建 + JSON/HTML/Canvas/Mermaid 导出）
-    ├── coach/            Learning Coach 学习计划规划器
-    ├── report.py         报告渲染（8 板块 + 技能评估 + 学习路线 + 附录）
-    └── web.py            零依赖 Web 界面
+RepoCourse 采用多 Agent 协作架构，数据从输入层逐层流向输出层：
+
+```mermaid
+flowchart LR
+    subgraph IN["用户输入层"]
+        A["项目代码"]
+        A2["Git 历史"]
+        A3["Agent 日志"]
+        A4["profile.yaml"]
+    end
+    subgraph AG["分析 Agent 层"]
+        B["Repo Scanner"]
+        C["Code Understanding Agent"]
+        D["Knowledge Graph Agent"]
+        E["Evidence Agent"]
+    end
+    subgraph EV["评估层"]
+        F["Skill Assessment"]
+        G["Quiz Agent"]
+        H["Learning Coach"]
+    end
+    subgraph OUT["输出层"]
+        I["README 复盘报告"]
+        J["Learning Report"]
+        K["知识图谱可视化"]
+        L["学习路线"]
+    end
+    A --> B
+    A2 --> E
+    A3 --> E
+    A4 --> F
+    B --> C
+    C --> D
+    D --> F
+    E --> F
+    F --> G
+    F --> H
+    G --> I
+    H --> J
+    D --> K
+    H --> L
+```
+
+**用户输入层**
+
+- 项目代码仓库
+- Git 历史
+- Agent 日志
+- profile.yaml（技能档案）
+
+**分析 Agent 层**
+
+- **Repo Scanner** —— 负责：项目扫描、技术栈识别
+- **Code Understanding Agent** —— 负责：代码结构理解、核心逻辑分析
+- **Knowledge Graph Agent** —— 负责：建立项目知识关系
+- **Evidence Agent** —— 负责：分析 AI 参与证据
+
+**评估层**
+
+- **Skill Assessment** —— 负责：结合项目需求和用户能力评估
+- **Quiz Agent** —— 负责：实践验证
+- **Learning Coach** —— 负责：生成学习建议
+
+**输出层**
+
+- README 复盘报告
+- Learning Report
+- Knowledge Graph（JSON / HTML / Obsidian Canvas / 技能树）
+- 学习路线（learning_plan.json）
+
 
 ## 路线图
 
