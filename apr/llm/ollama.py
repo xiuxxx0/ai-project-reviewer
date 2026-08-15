@@ -31,7 +31,8 @@ class OllamaProvider(LLMProvider):
             url, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
             headers={"Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            from .openai_compat import _urlopen_with_fallback
+            with _urlopen_with_fallback(req, self.timeout) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             body = ""

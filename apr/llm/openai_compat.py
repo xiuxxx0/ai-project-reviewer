@@ -13,6 +13,20 @@ from ..errors import LLMError
 from .base import ChatMessage, LLMProvider
 
 
+def _urlopen_with_fallback(req, timeout):
+    """系统代理（如 Clash）未运行导致连接被拒时，直连重试一次。
+
+    HTTP 错误（4xx/5xx）说明网络已通，直接上抛，不回退。
+    """
+    try:
+        return urllib.request.urlopen(req, timeout=timeout)
+    except urllib.error.HTTPError:
+        raise
+    except urllib.error.URLError:
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        return opener.open(req, timeout=timeout)
+
+
 class OpenAICompatProvider(LLMProvider):
     def __init__(self, name: str, base_url: str, model: str, api_key: str, timeout: int = 300):
         if not base_url:
@@ -42,7 +56,7 @@ class OpenAICompatProvider(LLMProvider):
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"},
         )
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            with _urlopen_with_fallback(req, self.timeout) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             body = ""

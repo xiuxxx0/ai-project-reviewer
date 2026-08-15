@@ -155,6 +155,11 @@ def cmd_review(project: Path, cfg: Config, args) -> int:
         print(f"✖ 写入报告失败：{e}", file=sys.stderr)
         return 1
     print("")
+    failed = sum(1 for _, md in result.sections if "生成失败" in md)
+    llm_sections = len(result.sections) - 2   # 盲区与 AI 协作分析由证据引擎计算
+    if failed >= llm_sections:
+        print("⚠ 所有 LLM 板块均失败，报告为空壳占位内容。")
+        print("  请检查：网络/系统代理（工具已支持代理失败自动直连）、API Key、模型名。")
     print(f"✔ 技术复盘报告：{out}")
     print(f"✔ 学习成长报告：{learn_out}")
     size_kb = len(report.encode("utf-8")) // 1024
