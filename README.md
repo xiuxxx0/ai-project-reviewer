@@ -2,6 +2,8 @@
 
 [English](README_EN.md) | 中文
 
+![PyPI](https://img.shields.io/pypi/v/repocourse)
+![Downloads](https://img.shields.io/pypi/dm/repocourse)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Stars](https://img.shields.io/github/stars/xiuxxx0/ai-project-reviewer)
