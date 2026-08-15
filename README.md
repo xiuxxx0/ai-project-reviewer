@@ -150,13 +150,13 @@ apr review .
 
 真实运行效果：
 
-![复盘生成过程](photos/terminal-review.png)
+![复盘生成过程](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/terminal-review.png)
 
-![生成的复盘报告](photos/report-md.png)
+![生成的复盘报告](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/report-md.png)
 
 ## 安装
 
-    pip install -e .
+    pip install repocourse
 
 或不用安装，直接运行：
 
@@ -274,11 +274,11 @@ apr review .
 
 启动 Web 服务：
 
-![启动 Web 服务](photos/terminal-web-start.png)
+![启动 Web 服务](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/terminal-web-start.png)
 
 网页界面：
 
-![Web 界面](photos/web-ui.png)
+![Web 界面](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/web-ui.png)
 
 ## 切换模型（apr config）
 

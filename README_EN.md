@@ -111,14 +111,14 @@ your-project/
 └── learning_plan.json          # personalized learning plan
 ```
 
-![Review process](photos/terminal-review.png)
+![Review process](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/terminal-review.png)
 
-![Generated report](photos/report-md.png)
+![Generated report](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/report-md.png)
 
 ## Install
 
 ```bash
-pip install -e .
+pip install repocourse
 ```
 
 Or run directly without installing:
@@ -149,7 +149,7 @@ apr config       # switch LLM providers interactively
 
 Web UI:
 
-![Web UI](photos/web-ui.png)
+![Web UI](https://raw.githubusercontent.com/xiuxxx0/ai-project-reviewer/main/photos/web-ui.png)
 
 ## Architecture
 
