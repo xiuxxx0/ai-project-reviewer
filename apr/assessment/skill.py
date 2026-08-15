@@ -26,6 +26,9 @@ from .quiz import QuizResult
 
 LEVELS = ["beginner", "intermediate", "advanced", "expert"]
 
+# 报告中展示用的中文等级标签
+LEVEL_LABELS = {"beginner": "入门", "intermediate": "掌握", "advanced": "熟练", "expert": "精通"}
+
 _LEVEL_ALIASES = {
     "初级": "beginner", "入门": "beginner", "beginner": "beginner", "novice": "beginner",
     "中级": "intermediate", "intermediate": "intermediate",
@@ -49,6 +52,7 @@ class SkillAssessmentEntry:
     quiz_score: int | None
     final_level: str
     confidence: float
+    project_evidence: list[str] = field(default_factory=list)  # 项目使用证据（报告中单独展示）
 
     def to_dict(self) -> dict:
         return {
@@ -300,10 +304,14 @@ def assess_skills(profile: Profile | None = None,
         elif profile is not None and profile.known_skills:
             evidence_lines.append("技能档案未声明")
 
+        project_lines: list[str] = []
         if files:
+            line = f"使用 {skill} 编写 {len(files)} 个文件"
             evidence_lines.append(f"项目使用 {skill} {len(files)} 个文件")
+            project_lines.append(line)
         elif meta.get("used"):
             evidence_lines.append(f"项目依赖/平台声明使用 {skill}")
+            project_lines.append(f"项目依赖/平台声明使用 {skill}")
         else:
             assessment.notes.append(f"{skill}：档案声明但项目未实际使用")
 
@@ -327,5 +335,6 @@ def assess_skills(profile: Profile | None = None,
             final_level=_final_level(claimed, len(files), quiz_score, ai_share),
             confidence=_confidence(claimed, len(files), bool(meta.get("used")),
                                    quiz_score, ai_share, ai_n),
+            project_evidence=project_lines,
         )
     return assessment
