@@ -149,6 +149,81 @@ class KnowledgeGraph:
         path.write_text(_HTML_TEMPLATE.replace("__DATA__", data), encoding="utf-8")
         return path
 
+    def export_obsidian_canvas(self, path: Path) -> Path:
+        """导出 Obsidian Canvas（.canvas）：分层排布的可视化画布，直接拖入 Vault 使用。"""
+        layer_x = {"file": 0, "tech": 460, "topic": 920, "skill": 1380}
+        layer_color = {"file": "5", "tech": "4", "topic": "3", "skill": "6"}
+        canvas_nodes = []
+        id_map: dict[str, str] = {}
+        for i, node in enumerate(sorted(self.nodes.values(), key=lambda n: n.id)):
+            id_map[node.id] = "n" + str(i + 1)
+        y_cursor = {k: 40 for k in layer_x}
+        for node in sorted(self.nodes.values(), key=lambda n: (n.kind, n.id)):
+            if node.kind == "skill":
+                mastery = node.properties.get("mastery_percent")
+                text = "**" + node.name + "**\n掌握程度 " + (str(mastery) + "%" if mastery is not None else "未评估")
+            elif node.kind == "tech":
+                text = "**" + node.name + "**"
+                if node.properties.get("file_count"):
+                    text += "\n文件数 " + str(node.properties["file_count"])
+            else:
+                text = node.name
+            lines = text.count("\n") + 1
+            height = 20 * lines + 26
+            x = layer_x.get(node.kind, 0)
+            y = y_cursor.get(node.kind, 40)
+            y_cursor[node.kind] = y + height + 24
+            canvas_nodes.append({
+                "id": id_map[node.id], "type": "text", "text": text,
+                "x": x, "y": y, "width": 280, "height": height,
+                "color": layer_color.get(node.kind, "1"),
+            })
+        canvas_edges = []
+        for i, rel in enumerate(self.relations):
+            if rel.source not in id_map or rel.target not in id_map:
+                continue
+            canvas_edges.append({
+                "id": "e" + str(i + 1),
+                "fromNode": id_map[rel.source], "toNode": id_map[rel.target],
+                "fromSide": "right", "toSide": "left",
+                "label": rel.kind,
+                "color": "2",
+            })
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"nodes": canvas_nodes, "edges": canvas_edges},
+                                   ensure_ascii=False, indent=2), encoding="utf-8")
+        return path
+
+    def export_obsidian_mindmap(self, path: Path) -> Path:
+        """导出 Mermaid mindmap 的 Markdown（.md）：Obsidian 原生渲染为思维导图。"""
+        lines = ["mindmap", "  root((" + _mm_safe(self.project or "项目") + "))"]
+        tech_nodes = sorted([n for n in self.nodes.values() if n.kind == "tech"],
+                            key=lambda n: n.name)
+        for tech in tech_nodes:
+            lines.append("    " + _mm_safe(tech.name))
+            file_ids = sorted({r.source for r in self.relations
+                               if r.target == tech.id and r.kind == "uses"})
+            for fid in file_ids:
+                node = self.nodes.get(fid)
+                lines.append("      " + _mm_safe(node.name if node else fid))
+            topic_ids = sorted({r.target for r in self.relations
+                                if r.source == tech.id and r.kind == "covers"})
+            for tid in topic_ids:
+                node = self.nodes.get(tid)
+                lines.append("      " + _mm_safe(node.name if node else tid))
+            skill_rels = [r for r in self.relations
+                          if r.source == tech.id and r.target.startswith("skill:")]
+            for rel in skill_rels:
+                node = self.nodes.get(rel.target)
+                if node is None:
+                    continue
+                mastery = node.properties.get("mastery_percent")
+                label = node.name + (" 掌握" + str(mastery) + "%" if mastery is not None else "")
+                lines.append("      " + _mm_safe(label))
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("\n".join(lines), encoding="utf-8")
+        return path
+
     def render_text(self) -> str:
         c = self.counts()
         lines = [
@@ -294,6 +369,13 @@ def build_knowledge_graph(profile: Profile | None = None,
                            f"置信度 {entry.confidence:.0%}）",
                     confidence=entry.confidence))
     return graph
+
+
+def _mm_safe(label: str) -> str:
+    """Mermaid mindmap 节点标签清洗：去掉会引起语法错误的字符。"""
+    for ch in ("(", ")", "[", "]", "{", "}", "\"", "#", "<", ">", chr(96)):
+        label = label.replace(ch, " ")
+    return " ".join(label.split()) or "未命名"
 
 
 # 零依赖可视化模板：内嵌数据 + 原生 JS 力导向布局（无 CDN、无第三方库）

@@ -221,9 +221,13 @@ def cmd_graph(project: Path, cfg: Config, args) -> int:
         out = project / out
     graph.save(out)
     html_out = graph.export_html(out.with_suffix(".html"))
+    canvas_out = graph.export_obsidian_canvas(project / "knowledge_graph.canvas")
+    mm_out = graph.export_obsidian_mindmap(project / "knowledge_graph-mindmap.md")
     counts = graph.counts()
     print(f"✔ 知识图谱已生成：{out}")
-    print(f"  可视化页面：{html_out}（浏览器打开）")
+    print(f"  浏览器可视化：{html_out}")
+    print(f"  Obsidian Canvas：{canvas_out}（拖入 Vault 即可打开）")
+    print(f"  Obsidian 导图：{mm_out}（Mermaid mindmap，Obsidian 原生渲染）")
     print(f"  节点 {counts['total_nodes']}（文件 {counts['file']} / 技术 {counts['tech']} / "
           f"知识点 {counts['topic']} / 技能 {counts['skill']}）｜ 关系 {counts['total_relations']}")
     return 0

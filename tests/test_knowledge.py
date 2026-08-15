@@ -140,6 +140,41 @@ class KnowledgeTest(unittest.TestCase):
         self.assertIn("tech:Redis", content)
         self.assertIn("DATA.project", content)
 
+    def test_export_obsidian_canvas(self):
+        root = fixture_dir("knowledge")
+        _java_project(root)
+        scan = _scan(root)
+        graph = build_knowledge_graph(scan=scan, digest=_digest(root, scan),
+                                      skill_assessment=_assessment())
+        out = graph.export_obsidian_canvas(root / "knowledge_graph.canvas")
+        self.assertTrue(out.is_file())
+        data = json.loads(out.read_text(encoding="utf-8"))
+        self.assertIn("nodes", data)
+        self.assertIn("edges", data)
+        self.assertGreaterEqual(len(data["nodes"]), 3)
+        techs = [n for n in data["nodes"] if n["color"] == "4"]
+        self.assertGreaterEqual(len(techs), 1)
+        labels = {e["label"] for e in data["edges"]}
+        self.assertIn("uses", labels)
+        self.assertIn("assessed", labels)
+        skills = [n for n in data["nodes"] if "掌握程度" in n["text"]]
+        self.assertGreaterEqual(len(skills), 1)
+
+    def test_export_obsidian_mindmap(self):
+        root = fixture_dir("knowledge")
+        _java_project(root)
+        scan = _scan(root)
+        graph = build_knowledge_graph(scan=scan, digest=_digest(root, scan),
+                                      skill_assessment=_assessment())
+        out = graph.export_obsidian_mindmap(root / "knowledge_graph-mindmap.md")
+        self.assertTrue(out.is_file())
+        content = out.read_text(encoding="utf-8")
+        self.assertTrue(content.startswith("mindmap"))
+        self.assertIn("Redis", content)
+        self.assertIn("缓存", content)
+        self.assertIn("掌握40%", content)
+        self.assertIn("UserService.java", content)
+
     def test_counts(self):
         g = KnowledgeGraph()
         g.add_node(KnowledgeNode(id="t:1", kind="tech", name="X"))
