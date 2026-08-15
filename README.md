@@ -72,6 +72,21 @@ RepoCourse 自动分析代码仓库，帮助开发者快速理解：
 
 **对应技术**：Quiz Agent · Learning Coach Agent
 
+## 工作流程
+
+输入一个项目，一次复盘走完以下链路：
+
+```mermaid
+flowchart TD
+    A[我的代码项目] --> B[项目扫描 Repo Scanner]
+    B --> C[代码理解 Code Understanding]
+    C --> D[知识图谱构建 Knowledge Graph]
+    D --> E[AI 协作分析]
+    E --> F[技能评估 Skill Assessment]
+    F --> G[生成复盘报告 README复盘.md]
+    F --> H[生成学习建议 learning_report.md]
+```
+
 ## 安装
 
     pip install -e .
