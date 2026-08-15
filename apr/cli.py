@@ -137,17 +137,26 @@ def cmd_review(project: Path, cfg: Config, args) -> int:
     except QuizAborted:
         print("\n已取消问答。")
         return 130
-    out = Path(args.output) if args.output else project / cfg.output.file
-    if not out.is_absolute():
-        out = project / out
+    # 双报告输出：技术复盘 + 学习者成长报告（默认 output/ 目录）
+    from .learning_report import render_learning_report
+    if args.output:
+        out = Path(args.output)
+        if not out.is_absolute():
+            out = project / out
+    else:
+        out = project / "output" / cfg.output.file
+    learn_out = out.parent / "learning_report.md"
     report = render_report(result)
     try:
+        out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(report, encoding="utf-8")
+        learn_out.write_text(render_learning_report(result), encoding="utf-8")
     except OSError as e:
         print(f"✖ 写入报告失败：{e}", file=sys.stderr)
         return 1
     print("")
-    print(f"✔ 报告已生成：{out}")
+    print(f"✔ 技术复盘报告：{out}")
+    print(f"✔ 学习成长报告：{learn_out}")
     size_kb = len(report.encode("utf-8")) // 1024
     quiz_note = f" ｜ 实践验证 {result.quiz.overall}/100" if result.quiz else ""
     print(f"  大小 {size_kb} KB ｜ 板块 {len(result.sections)} 个 ｜ 证据 {len(result.evidence.items)} 条{quiz_note}")

@@ -46,7 +46,9 @@
 
        apr review .
 
-   生成的《README复盘.md》位于项目根目录。
+   生成两份报告（位于项目根目录 output/ 下）：
+   - output/README复盘.md —— 技术复盘（面向开发者/面试）
+   - output/learning_report.md —— 学习成长反馈（面向学习者：学到了什么/AI 协作/盲区/学习路线）
 
 ## 报告结构
 

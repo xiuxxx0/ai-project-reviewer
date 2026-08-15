@@ -20,7 +20,7 @@ _FIXTURES = {
     "digest": [],
     "quiz": [],
     "web": [],
-    "knowledge": [],
+    "knowledge": ["output"],
     "dsh": [],
 }
 
