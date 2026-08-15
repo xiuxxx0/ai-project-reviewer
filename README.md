@@ -1,5 +1,13 @@
 # RepoCourse · AI 时代的项目学习复盘助手
 
+[English](README_EN.md) | 中文
+
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Stars](https://img.shields.io/github/stars/xiuxxx0/ai-project-reviewer)
+![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen)
+![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek%20%7C%20OpenAI%20%7C%20Ollama-4D6BFE)
+
 > 让 AI 辅助编程时代，每一次「完成项目」都变成「理解项目」。
 
 ## 为什么需要它
