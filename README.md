@@ -140,6 +140,12 @@ apr review .
 
 > 完整示例见本仓库 output/ 目录——对 RepoCourse 自身复盘的真实产物。
 
+真实运行效果：
+
+![复盘生成过程](photos/terminal-review.png)
+
+![生成的复盘报告](photos/report-md.png)
+
 ## 安装
 
     pip install -e .
@@ -217,11 +223,12 @@ apr review .
 
 ## 知识图谱（apr graph）
 
-    apr graph <项目路径>     # 生成 4 个文件：
+    apr graph <项目路径>     # 生成 5 个文件：
     knowledge_graph.json          # 标准图数据（节点/关系）
     knowledge_graph.html          # Obsidian 关系图谱风格可视化（拖拽/缩放/悬停高亮）
     knowledge_graph.canvas        # Obsidian Canvas 四列分层画布（拖入 Vault 即用）
     knowledge_graph-mindmap.md    # Mermaid 思维导图（Obsidian 原生渲染）
+    knowledge_learning.canvas     # 学习技能树（游戏技能树风格，面向初学者）
 
 图谱四层：文件 ─uses→ 技术 ─covers→ 知识点 ─assesses→ 用户技能（掌握程度 %）。
 文件节点带 AI 贡献徽标，技术节点带平均 AI 贡献——一眼看出哪些是「纸面掌握」。
@@ -236,7 +243,7 @@ apr review .
 
     apr review <项目路径>        # 生成复盘报告（默认 README复盘.md）
     apr scan <项目路径>          # 只扫描并预览技术栈，不调用 LLM
-    apr graph <项目路径>         # 生成知识图谱（json/html/canvas/mindmap）
+    apr graph <项目路径>         # 生成知识图谱（json/html/canvas/mindmap/学习技能树）
     apr plan <项目路径>          # 生成个性化学习计划 learning_plan.json
     apr quiz <项目路径>          # 只运行实践验证问答
     apr init <项目路径>          # 生成 apr.yaml 与 profile.yaml 模板
@@ -256,6 +263,14 @@ apr review .
 零第三方依赖（stdlib http.server），功能：输入项目路径 → 项目预览 → 一键复盘 →
 实时进度日志 → 报告预览与下载。Web 端默认跳过交互问答（答题升级为学习评估系统
 属 Phase 4）。
+
+启动 Web 服务：
+
+![启动 Web 服务](photos/terminal-web-start.png)
+
+网页界面：
+
+![Web 界面](photos/web-ui.png)
 
 ## 切换模型（apr config）
 
