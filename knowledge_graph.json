@@ -1,11 +1,11 @@
 {
   "version": 1,
   "project": "ai-project-reviewer",
-  "generated_at": "2026-08-15T18:04:45",
+  "generated_at": "2026-08-15T18:37:22",
   "stats": {
-    "total_nodes": 128,
-    "total_relations": 138,
-    "file": 9,
+    "total_nodes": 130,
+    "total_relations": 142,
+    "file": 11,
     "tech": 27,
     "topic": 75,
     "skill": 17
@@ -54,7 +54,10 @@
       "id": "file:tests/test_coach.py",
       "kind": "file",
       "name": "tests/test_coach.py",
-      "properties": {}
+      "properties": {
+        "ai_contribution": 0.0,
+        "ai_classification": "疑似人工"
+      }
     },
     {
       "id": "file:tests/test_event_bridge.py",
@@ -70,6 +73,18 @@
         "ai_contribution": 0.0,
         "ai_classification": "疑似人工"
       }
+    },
+    {
+      "id": "file:tests/test_learning_canvas.py",
+      "kind": "file",
+      "name": "tests/test_learning_canvas.py",
+      "properties": {}
+    },
+    {
+      "id": "file:tests/test_learning_report.py",
+      "kind": "file",
+      "name": "tests/test_learning_report.py",
+      "properties": {}
     },
     {
       "id": "file:tests/test_report_route.py",
@@ -397,7 +412,7 @@
       "kind": "tech",
       "name": "Python",
       "properties": {
-        "file_count": 61
+        "file_count": 67
       }
     },
     {
@@ -445,7 +460,7 @@
       "kind": "tech",
       "name": "TOML",
       "properties": {
-        "file_count": 2
+        "file_count": 1
       }
     },
     {
@@ -1183,6 +1198,34 @@
     },
     {
       "source": "file:tests/test_knowledge.py",
+      "target": "tech:Python",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
+      "source": "file:tests/test_learning_canvas.py",
+      "target": "tech:Redis",
+      "kind": "uses",
+      "detail": "检测到 RedisTemplate",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:tests/test_learning_canvas.py",
+      "target": "tech:Python",
+      "kind": "written-in",
+      "detail": "语言归属",
+      "confidence": 1.0
+    },
+    {
+      "source": "file:tests/test_learning_report.py",
+      "target": "tech:Redis",
+      "kind": "uses",
+      "detail": "检测到 RedisTemplate",
+      "confidence": 0.9
+    },
+    {
+      "source": "file:tests/test_learning_report.py",
       "target": "tech:Python",
       "kind": "written-in",
       "detail": "语言归属",

@@ -214,7 +214,9 @@ def cmd_config(args) -> int:
 
 
 def cmd_graph(project: Path, cfg: Config, args) -> int:
+    from .assessment.blindspot import detect_blind_spots
     from .assessment.skill import assess_skills
+    from .coach.planner import build_learning_plan
     from .evidence.fusion import fuse
     from .evidence.git import collect_git_evidence
     from .evidence.markers import scan_markers
@@ -229,6 +231,11 @@ def cmd_graph(project: Path, cfg: Config, args) -> int:
     evidence = fuse(items, scan.rel_set(), git_notes, [])
     profile = load_profile(project / cfg.profile)
     assessment = assess_skills(profile=profile, scan=scan, quiz=None, evidence=evidence)
+    blind_spots = detect_blind_spots(profile=profile, scan=scan, digest=digest,
+                                     quiz=None, evidence=evidence)
+    plan = build_learning_plan(profile=profile, scan=scan, digest=digest,
+                               quiz=None, evidence=evidence,
+                               assessment=assessment, blind_spots=blind_spots)
     graph = build_knowledge_graph(profile=profile, scan=scan, digest=digest,
                                   evidence=evidence, skill_assessment=assessment)
     out = Path(args.output) if getattr(args, "output", None) else project / "knowledge_graph.json"
@@ -238,11 +245,15 @@ def cmd_graph(project: Path, cfg: Config, args) -> int:
     html_out = graph.export_html(out.with_suffix(".html"))
     canvas_out = graph.export_obsidian_canvas(project / "knowledge_graph.canvas")
     mm_out = graph.export_obsidian_mindmap(project / "knowledge_graph-mindmap.md")
+    learn_out = graph.export_learning_canvas(project / "knowledge_learning.canvas",
+                                             assessment=assessment,
+                                             blind_spots=blind_spots, plan=plan)
     counts = graph.counts()
     print(f"✔ 知识图谱已生成：{out}")
     print(f"  浏览器可视化（Obsidian 风格关系图谱）：{html_out}")
     print(f"  Obsidian Canvas：{canvas_out}（拖入 Vault 即可打开）")
     print(f"  Obsidian 导图：{mm_out}（Mermaid mindmap，Obsidian 原生渲染）")
+    print(f"  学习技能树：{learn_out}（游戏技能树风格，面向初学者）")
     print(f"  节点 {counts['total_nodes']}（文件 {counts['file']} / 技术 {counts['tech']} / "
           f"知识点 {counts['topic']} / 技能 {counts['skill']}）｜ 关系 {counts['total_relations']}")
     return 0

@@ -284,6 +284,126 @@ class KnowledgeGraph:
                                    ensure_ascii=False, indent=2), encoding="utf-8")
         return path
 
+    def export_learning_canvas(self, path: Path, assessment=None, blind_spots=None,
+                               plan=None) -> Path:
+        """学习模式 Canvas（knowledge_learning.canvas）：游戏技能树风格。
+
+        中心项目 → 我做了什么 → 涉及技术（≤10）→ 我学到了什么（≤20）→ 下一步学习（≤10）。
+        不显示代码文件与 AST 细节；技术按 已掌握/学习中/待学习 着色。
+        独立于 knowledge_graph.canvas（原开发者视图不变）。
+        """
+        from .learning_canvas import (LEARNING_COL_X, LEARNING_MAX_TASKS,
+                                      LEARNING_MAX_TECHS, LEARNING_MAX_TOPICS,
+                                      LEARNING_TOPICS_PER_TECH,
+                                      LEARNING_STATUS_COLOR, TASK_LEVEL_COLOR,
+                                      learning_tech_status)
+        canvas_nodes: list[dict] = []
+        canvas_edges: list[dict] = []
+
+        def add(nid, text, x, y, w, h, color):
+            canvas_nodes.append({"id": nid, "type": "text", "text": text,
+                                 "x": x, "y": y, "width": w, "height": h,
+                                 "color": color})
+
+        def edge(eid, src, dst):
+            canvas_edges.append({"id": eid, "fromNode": src, "toNode": dst,
+                                  "fromSide": "right", "toSide": "left",
+                                  "color": "2"})
+
+        project = self.project or "项目"
+        add("title", "**" + project + " · 学习技能树**", 0, 0, 320, 60, "6")
+        add("legend", "图例：绿色=已掌握 黄色=学习中 红色=待学习", 0, 80, 320, 40, "2")
+        add("hub", "**" + project + "**", 0, 220, 320, 80, "6")
+        headers = [("hdr-do", "我做了什么", LEARNING_COL_X["do"]),
+                   ("hdr-tech", "涉及技术", LEARNING_COL_X["tech"]),
+                   ("hdr-topic", "我学到了什么", LEARNING_COL_X["topic"]),
+                   ("hdr-task", "下一步学习", LEARNING_COL_X["task"])]
+        for nid, text, x in headers:
+            add(nid, text, x, 80, 260, 40, "2")
+
+        # 第一层：我做了什么（概览卡片，无代码文件）
+        ai_files = sum(1 for n in self.nodes.values() if n.kind == "file"
+                       and (n.properties.get("ai_contribution") or 0) >= 0.3)
+        human_files = sum(1 for n in self.nodes.values() if n.kind == "file"
+                           and (n.properties.get("ai_contribution") or 0) < 0.3)
+        usage: dict[str, int] = {}
+        for rel in self.relations:
+            if rel.kind == "uses":
+                usage[rel.target] = usage.get(rel.target, 0) + 1
+        tech_candidates = [n for n in self.nodes.values() if n.kind == "tech"
+                           and usage.get(n.id, 0) > 0]
+        tech_candidates.sort(key=lambda n: (-usage.get(n.id, 0), n.name))
+        techs = tech_candidates[:LEARNING_MAX_TECHS]
+        if not techs:
+            techs = sorted([n for n in self.nodes.values() if n.kind == "tech"],
+                            key=lambda n: n.name)[:LEARNING_MAX_TECHS]
+
+        do_cards = [
+            "独立编写 " + str(human_files) + " 个文件",
+            "与 AI 协作完成 " + str(ai_files) + " 个文件",
+            "梳理了 " + str(len(techs)) + " 项技术",
+        ]
+        for i, text in enumerate(do_cards):
+            add("c" + str(i + 1), text, LEARNING_COL_X["do"], 140 + i * 180, 260, 80, "5")
+            edge("e-do" + str(i + 1), "hub", "c" + str(i + 1))
+
+        # 第二层：涉及技术（状态着色）
+        status: dict[str, str] = {}
+        for i, node in enumerate(techs):
+            st = learning_tech_status(self, node.name, assessment, blind_spots)
+            status[node.name] = st
+            add("t" + str(i + 1), "**" + node.name + "**\n" + st,
+                LEARNING_COL_X["tech"], 140 + i * 180, 260, 80,
+                LEARNING_STATUS_COLOR[st])
+            edge("e-t" + str(i + 1), "hub", "t" + str(i + 1))
+
+        # 第三层：我学到了什么（知识点，每技术 ≤4，共 ≤20）
+        topic_items = []
+        seen_topics = set()
+        for tech in techs:
+            cnt = 0
+            for rel in self.relations:
+                if rel.source != tech.id or rel.kind != "covers":
+                    continue
+                tnode = self.nodes.get(rel.target)
+                if tnode is None or tnode.id in seen_topics:
+                    continue
+                seen_topics.add(tnode.id)
+                topic_items.append((tech.name, tnode.name, status[tech.name]))
+                cnt += 1
+                if cnt >= LEARNING_TOPICS_PER_TECH:
+                    break
+            if len(topic_items) >= LEARNING_MAX_TOPICS:
+                break
+        for i, (tech_name, topic_name, st) in enumerate(topic_items):
+            add("k" + str(i + 1), topic_name, LEARNING_COL_X["topic"],
+                140 + i * 180, 260, 80, LEARNING_STATUS_COLOR[st])
+            tech_idx = next((j + 1 for j, t in enumerate(techs) if t.name == tech_name), None)
+            if tech_idx:
+                edge("e-k" + str(i + 1), "t" + str(tech_idx), "k" + str(i + 1))
+
+        # 第四层：下一步学习（任务 ≤10）
+        tasks = []
+        if plan is not None:
+            for item in plan.priority[:LEARNING_MAX_TASKS]:
+                action = item.action[0] if item.action else ("学习 " + item.skill)
+                tasks.append((item.skill, action, item.level))
+        for i, (skill, action, level) in enumerate(tasks):
+            add("x" + str(i + 1), "**" + skill + "**\n" + action,
+                LEARNING_COL_X["task"], 140 + i * 180, 260, 80,
+                TASK_LEVEL_COLOR.get(level, "3"))
+            tech_idx = next((j + 1 for j, t in enumerate(techs)
+                             if t.name.lower() == skill.lower()), None)
+            if tech_idx:
+                edge("e-x" + str(i + 1), "t" + str(tech_idx), "x" + str(i + 1))
+            else:
+                edge("e-x" + str(i + 1), "hub", "x" + str(i + 1))
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"nodes": canvas_nodes, "edges": canvas_edges},
+                                   ensure_ascii=False, indent=2), encoding="utf-8")
+        return path
+
     def export_obsidian_mindmap(self, path: Path) -> Path:
         """导出 Mermaid mindmap 的 Markdown（.md）：Obsidian 原生渲染为思维导图。"""
         lines = ["mindmap", "  root((" + _mm_safe(self.project or "项目") + "))"]

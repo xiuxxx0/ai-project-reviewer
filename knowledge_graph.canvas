@@ -113,7 +113,7 @@
     {
       "id": "file:tests/test_coach.py",
       "type": "text",
-      "text": "tests/test_coach.py",
+      "text": "tests/test_coach.py\nAI 贡献 0%",
       "x": 0,
       "y": 1220,
       "width": 260,
@@ -131,11 +131,21 @@
       "color": "5"
     },
     {
-      "id": "file:tests/test_report_route.py",
+      "id": "file:tests/test_learning_canvas.py",
       "type": "text",
-      "text": "tests/test_report_route.py",
+      "text": "tests/test_learning_canvas.py",
       "x": 0,
       "y": 1580,
+      "width": 260,
+      "height": 80,
+      "color": "5"
+    },
+    {
+      "id": "file:tests/test_learning_report.py",
+      "type": "text",
+      "text": "tests/test_learning_report.py",
+      "x": 0,
+      "y": 1760,
       "width": 260,
       "height": 80,
       "color": "5"
@@ -1054,7 +1064,7 @@
     },
     {
       "id": "e26",
-      "fromNode": "file:tests/test_report_route.py",
+      "fromNode": "file:tests/test_learning_canvas.py",
       "toNode": "tech:Redis",
       "fromSide": "right",
       "toSide": "left",
@@ -1062,8 +1072,8 @@
     },
     {
       "id": "e27",
-      "fromNode": "tech:Django",
-      "toNode": "topic:Admin",
+      "fromNode": "file:tests/test_learning_report.py",
+      "toNode": "tech:Redis",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1071,7 +1081,7 @@
     {
       "id": "e28",
       "fromNode": "tech:Django",
-      "toNode": "topic:MTV 架构",
+      "toNode": "topic:Admin",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1079,7 +1089,7 @@
     {
       "id": "e29",
       "fromNode": "tech:Django",
-      "toNode": "topic:ORM",
+      "toNode": "topic:MTV 架构",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1087,15 +1097,15 @@
     {
       "id": "e30",
       "fromNode": "tech:Django",
-      "toNode": "topic:中间件",
+      "toNode": "topic:ORM",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e31",
-      "fromNode": "tech:Elasticsearch",
-      "toNode": "topic:DSL 查询",
+      "fromNode": "tech:Django",
+      "toNode": "topic:中间件",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1103,7 +1113,7 @@
     {
       "id": "e32",
       "fromNode": "tech:Elasticsearch",
-      "toNode": "topic:倒排索引",
+      "toNode": "topic:DSL 查询",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1111,15 +1121,15 @@
     {
       "id": "e33",
       "fromNode": "tech:Elasticsearch",
-      "toNode": "topic:分词",
+      "toNode": "topic:倒排索引",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e34",
-      "fromNode": "tech:FastAPI",
-      "toNode": "topic:Pydantic",
+      "fromNode": "tech:Elasticsearch",
+      "toNode": "topic:分词",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1127,7 +1137,7 @@
     {
       "id": "e35",
       "fromNode": "tech:FastAPI",
-      "toNode": "topic:依赖注入",
+      "toNode": "topic:Pydantic",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1135,7 +1145,7 @@
     {
       "id": "e36",
       "fromNode": "tech:FastAPI",
-      "toNode": "topic:异步",
+      "toNode": "topic:依赖注入",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1143,15 +1153,15 @@
     {
       "id": "e37",
       "fromNode": "tech:FastAPI",
-      "toNode": "topic:路由",
+      "toNode": "topic:异步",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e38",
-      "fromNode": "tech:JWT",
-      "toNode": "topic:令牌结构",
+      "fromNode": "tech:FastAPI",
+      "toNode": "topic:路由",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1159,7 +1169,7 @@
     {
       "id": "e39",
       "fromNode": "tech:JWT",
-      "toNode": "topic:刷新机制",
+      "toNode": "topic:令牌结构",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1167,15 +1177,15 @@
     {
       "id": "e40",
       "fromNode": "tech:JWT",
-      "toNode": "topic:签名验证",
+      "toNode": "topic:刷新机制",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e41",
-      "fromNode": "tech:Kafka",
-      "toNode": "topic:分区与偏移",
+      "fromNode": "tech:JWT",
+      "toNode": "topic:签名验证",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1183,7 +1193,7 @@
     {
       "id": "e42",
       "fromNode": "tech:Kafka",
-      "toNode": "topic:消息可靠性",
+      "toNode": "topic:分区与偏移",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1191,15 +1201,15 @@
     {
       "id": "e43",
       "fromNode": "tech:Kafka",
-      "toNode": "topic:生产者/消费者",
+      "toNode": "topic:消息可靠性",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e44",
-      "fromNode": "tech:MongoDB",
-      "toNode": "topic:文档模型",
+      "fromNode": "tech:Kafka",
+      "toNode": "topic:生产者/消费者",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1207,7 +1217,7 @@
     {
       "id": "e45",
       "fromNode": "tech:MongoDB",
-      "toNode": "topic:索引",
+      "toNode": "topic:文档模型",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1215,15 +1225,15 @@
     {
       "id": "e46",
       "fromNode": "tech:MongoDB",
-      "toNode": "topic:聚合查询",
+      "toNode": "topic:索引",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e47",
-      "fromNode": "tech:MyBatis",
-      "toNode": "topic:SQL 映射",
+      "fromNode": "tech:MongoDB",
+      "toNode": "topic:聚合查询",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1231,7 +1241,7 @@
     {
       "id": "e48",
       "fromNode": "tech:MyBatis",
-      "toNode": "topic:一级/二级缓存",
+      "toNode": "topic:SQL 映射",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1239,15 +1249,15 @@
     {
       "id": "e49",
       "fromNode": "tech:MyBatis",
-      "toNode": "topic:动态 SQL",
+      "toNode": "topic:一级/二级缓存",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e50",
-      "fromNode": "tech:MySQL",
-      "toNode": "topic:CRUD",
+      "fromNode": "tech:MyBatis",
+      "toNode": "topic:动态 SQL",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1255,7 +1265,7 @@
     {
       "id": "e51",
       "fromNode": "tech:MySQL",
-      "toNode": "topic:SQL 优化",
+      "toNode": "topic:CRUD",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1263,7 +1273,7 @@
     {
       "id": "e52",
       "fromNode": "tech:MySQL",
-      "toNode": "topic:事务",
+      "toNode": "topic:SQL 优化",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1271,7 +1281,7 @@
     {
       "id": "e53",
       "fromNode": "tech:MySQL",
-      "toNode": "topic:基础SQL",
+      "toNode": "topic:事务",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1279,15 +1289,15 @@
     {
       "id": "e54",
       "fromNode": "tech:MySQL",
-      "toNode": "topic:表设计",
+      "toNode": "topic:基础SQL",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e55",
-      "fromNode": "tech:REST API",
-      "toNode": "topic:HTTP 语义",
+      "fromNode": "tech:MySQL",
+      "toNode": "topic:表设计",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1295,7 +1305,7 @@
     {
       "id": "e56",
       "fromNode": "tech:REST API",
-      "toNode": "topic:分页",
+      "toNode": "topic:HTTP 语义",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1303,7 +1313,7 @@
     {
       "id": "e57",
       "fromNode": "tech:REST API",
-      "toNode": "topic:状态码",
+      "toNode": "topic:分页",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1311,15 +1321,15 @@
     {
       "id": "e58",
       "fromNode": "tech:REST API",
-      "toNode": "topic:资源设计",
+      "toNode": "topic:状态码",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e59",
-      "fromNode": "tech:React",
-      "toNode": "topic:Hooks",
+      "fromNode": "tech:REST API",
+      "toNode": "topic:资源设计",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1327,7 +1337,7 @@
     {
       "id": "e60",
       "fromNode": "tech:React",
-      "toNode": "topic:状态管理",
+      "toNode": "topic:Hooks",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1335,7 +1345,7 @@
     {
       "id": "e61",
       "fromNode": "tech:React",
-      "toNode": "topic:组件",
+      "toNode": "topic:状态管理",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1343,15 +1353,15 @@
     {
       "id": "e62",
       "fromNode": "tech:React",
-      "toNode": "topic:虚拟 DOM",
+      "toNode": "topic:组件",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e63",
-      "fromNode": "tech:Redis",
-      "toNode": "topic:Key 设计",
+      "fromNode": "tech:React",
+      "toNode": "topic:虚拟 DOM",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1359,7 +1369,7 @@
     {
       "id": "e64",
       "fromNode": "tech:Redis",
-      "toNode": "topic:缓存",
+      "toNode": "topic:Key 设计",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1367,7 +1377,7 @@
     {
       "id": "e65",
       "fromNode": "tech:Redis",
-      "toNode": "topic:缓存穿透/击穿/雪崩",
+      "toNode": "topic:缓存",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1375,15 +1385,15 @@
     {
       "id": "e66",
       "fromNode": "tech:Redis",
-      "toNode": "topic:过期策略",
+      "toNode": "topic:缓存穿透/击穿/雪崩",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e67",
-      "fromNode": "tech:Spring",
-      "toNode": "topic:AOP",
+      "fromNode": "tech:Redis",
+      "toNode": "topic:过期策略",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1391,7 +1401,7 @@
     {
       "id": "e68",
       "fromNode": "tech:Spring",
-      "toNode": "topic:Bean 生命周期",
+      "toNode": "topic:AOP",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1399,7 +1409,7 @@
     {
       "id": "e69",
       "fromNode": "tech:Spring",
-      "toNode": "topic:IoC/DI",
+      "toNode": "topic:Bean 生命周期",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1407,15 +1417,15 @@
     {
       "id": "e70",
       "fromNode": "tech:Spring",
-      "toNode": "topic:事务管理",
+      "toNode": "topic:IoC/DI",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e71",
-      "fromNode": "tech:Spring Boot",
-      "toNode": "topic:Actuator",
+      "fromNode": "tech:Spring",
+      "toNode": "topic:事务管理",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1423,7 +1433,7 @@
     {
       "id": "e72",
       "fromNode": "tech:Spring Boot",
-      "toNode": "topic:Controller",
+      "toNode": "topic:Actuator",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1431,7 +1441,7 @@
     {
       "id": "e73",
       "fromNode": "tech:Spring Boot",
-      "toNode": "topic:REST API",
+      "toNode": "topic:Controller",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1439,7 +1449,7 @@
     {
       "id": "e74",
       "fromNode": "tech:Spring Boot",
-      "toNode": "topic:Service",
+      "toNode": "topic:REST API",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1447,15 +1457,15 @@
     {
       "id": "e75",
       "fromNode": "tech:Spring Boot",
-      "toNode": "topic:自动配置",
+      "toNode": "topic:Service",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e76",
-      "fromNode": "tech:Vue",
-      "toNode": "topic:Vite",
+      "fromNode": "tech:Spring Boot",
+      "toNode": "topic:自动配置",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1463,7 +1473,7 @@
     {
       "id": "e77",
       "fromNode": "tech:Vue",
-      "toNode": "topic:Vue 3",
+      "toNode": "topic:Vite",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1471,7 +1481,7 @@
     {
       "id": "e78",
       "fromNode": "tech:Vue",
-      "toNode": "topic:响应式",
+      "toNode": "topic:Vue 3",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
@@ -1479,13 +1489,21 @@
     {
       "id": "e79",
       "fromNode": "tech:Vue",
-      "toNode": "topic:基础状态与事件",
+      "toNode": "topic:响应式",
       "fromSide": "right",
       "toSide": "left",
       "color": "2"
     },
     {
       "id": "e80",
+      "fromNode": "tech:Vue",
+      "toNode": "topic:基础状态与事件",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e81",
       "fromNode": "topic:Actuator",
       "toNode": "skill:Spring Boot",
       "fromSide": "right",
@@ -1493,7 +1511,7 @@
       "color": "2"
     },
     {
-      "id": "e81",
+      "id": "e82",
       "fromNode": "topic:CRUD",
       "toNode": "skill:MySQL",
       "fromSide": "right",
@@ -1501,7 +1519,7 @@
       "color": "2"
     },
     {
-      "id": "e82",
+      "id": "e83",
       "fromNode": "topic:Controller",
       "toNode": "skill:Spring Boot",
       "fromSide": "right",
@@ -1509,7 +1527,7 @@
       "color": "2"
     },
     {
-      "id": "e83",
+      "id": "e84",
       "fromNode": "topic:Key 设计",
       "toNode": "skill:Redis",
       "fromSide": "right",
@@ -1517,7 +1535,7 @@
       "color": "2"
     },
     {
-      "id": "e84",
+      "id": "e85",
       "fromNode": "topic:REST API",
       "toNode": "skill:Spring Boot",
       "fromSide": "right",
@@ -1525,7 +1543,7 @@
       "color": "2"
     },
     {
-      "id": "e85",
+      "id": "e86",
       "fromNode": "topic:SQL 优化",
       "toNode": "skill:MySQL",
       "fromSide": "right",
@@ -1533,7 +1551,7 @@
       "color": "2"
     },
     {
-      "id": "e86",
+      "id": "e87",
       "fromNode": "topic:Service",
       "toNode": "skill:Spring Boot",
       "fromSide": "right",
@@ -1541,7 +1559,7 @@
       "color": "2"
     },
     {
-      "id": "e87",
+      "id": "e88",
       "fromNode": "topic:Vite",
       "toNode": "skill:Vue",
       "fromSide": "right",
@@ -1549,7 +1567,7 @@
       "color": "2"
     },
     {
-      "id": "e88",
+      "id": "e89",
       "fromNode": "topic:Vue 3",
       "toNode": "skill:Vue",
       "fromSide": "right",
@@ -1557,7 +1575,7 @@
       "color": "2"
     },
     {
-      "id": "e89",
+      "id": "e90",
       "fromNode": "topic:事务",
       "toNode": "skill:MySQL",
       "fromSide": "right",
@@ -1565,7 +1583,7 @@
       "color": "2"
     },
     {
-      "id": "e90",
+      "id": "e91",
       "fromNode": "topic:响应式",
       "toNode": "skill:Vue",
       "fromSide": "right",
@@ -1573,7 +1591,7 @@
       "color": "2"
     },
     {
-      "id": "e91",
+      "id": "e92",
       "fromNode": "topic:基础SQL",
       "toNode": "skill:MySQL",
       "fromSide": "right",
@@ -1581,7 +1599,7 @@
       "color": "2"
     },
     {
-      "id": "e92",
+      "id": "e93",
       "fromNode": "topic:基础状态与事件",
       "toNode": "skill:Vue",
       "fromSide": "right",
@@ -1589,7 +1607,7 @@
       "color": "2"
     },
     {
-      "id": "e93",
+      "id": "e94",
       "fromNode": "topic:缓存",
       "toNode": "skill:Redis",
       "fromSide": "right",
@@ -1597,7 +1615,7 @@
       "color": "2"
     },
     {
-      "id": "e94",
+      "id": "e95",
       "fromNode": "topic:缓存穿透/击穿/雪崩",
       "toNode": "skill:Redis",
       "fromSide": "right",
@@ -1605,7 +1623,7 @@
       "color": "2"
     },
     {
-      "id": "e95",
+      "id": "e96",
       "fromNode": "topic:自动配置",
       "toNode": "skill:Spring Boot",
       "fromSide": "right",
@@ -1613,7 +1631,7 @@
       "color": "2"
     },
     {
-      "id": "e96",
+      "id": "e97",
       "fromNode": "topic:表设计",
       "toNode": "skill:MySQL",
       "fromSide": "right",
@@ -1621,7 +1639,7 @@
       "color": "2"
     },
     {
-      "id": "e97",
+      "id": "e98",
       "fromNode": "topic:过期策略",
       "toNode": "skill:Redis",
       "fromSide": "right",

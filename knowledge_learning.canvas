@@ -1,0 +1,850 @@
+{
+  "nodes": [
+    {
+      "id": "title",
+      "type": "text",
+      "text": "**ai-project-reviewer · 学习技能树**",
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 60,
+      "color": "6"
+    },
+    {
+      "id": "legend",
+      "type": "text",
+      "text": "图例：绿色=已掌握 黄色=学习中 红色=待学习",
+      "x": 0,
+      "y": 80,
+      "width": 320,
+      "height": 40,
+      "color": "2"
+    },
+    {
+      "id": "hub",
+      "type": "text",
+      "text": "**ai-project-reviewer**",
+      "x": 0,
+      "y": 220,
+      "width": 320,
+      "height": 80,
+      "color": "6"
+    },
+    {
+      "id": "hdr-do",
+      "type": "text",
+      "text": "我做了什么",
+      "x": 320,
+      "y": 80,
+      "width": 260,
+      "height": 40,
+      "color": "2"
+    },
+    {
+      "id": "hdr-tech",
+      "type": "text",
+      "text": "涉及技术",
+      "x": 680,
+      "y": 80,
+      "width": 260,
+      "height": 40,
+      "color": "2"
+    },
+    {
+      "id": "hdr-topic",
+      "type": "text",
+      "text": "我学到了什么",
+      "x": 1040,
+      "y": 80,
+      "width": 260,
+      "height": 40,
+      "color": "2"
+    },
+    {
+      "id": "hdr-task",
+      "type": "text",
+      "text": "下一步学习",
+      "x": 1400,
+      "y": 80,
+      "width": 260,
+      "height": 40,
+      "color": "2"
+    },
+    {
+      "id": "c1",
+      "type": "text",
+      "text": "独立编写 11 个文件",
+      "x": 320,
+      "y": 140,
+      "width": 260,
+      "height": 80,
+      "color": "5"
+    },
+    {
+      "id": "c2",
+      "type": "text",
+      "text": "与 AI 协作完成 0 个文件",
+      "x": 320,
+      "y": 320,
+      "width": 260,
+      "height": 80,
+      "color": "5"
+    },
+    {
+      "id": "c3",
+      "type": "text",
+      "text": "梳理了 10 项技术",
+      "x": 320,
+      "y": 500,
+      "width": 260,
+      "height": 80,
+      "color": "5"
+    },
+    {
+      "id": "t1",
+      "type": "text",
+      "text": "**Redis**\n待学习",
+      "x": 680,
+      "y": 140,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t2",
+      "type": "text",
+      "text": "**MySQL**\n待学习",
+      "x": 680,
+      "y": 320,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t3",
+      "type": "text",
+      "text": "**REST API**\n待学习",
+      "x": 680,
+      "y": 500,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t4",
+      "type": "text",
+      "text": "**Spring**\n待学习",
+      "x": 680,
+      "y": 680,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t5",
+      "type": "text",
+      "text": "**React**\n待学习",
+      "x": 680,
+      "y": 860,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t6",
+      "type": "text",
+      "text": "**Django**\n待学习",
+      "x": 680,
+      "y": 1040,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t7",
+      "type": "text",
+      "text": "**Elasticsearch**\n待学习",
+      "x": 680,
+      "y": 1220,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t8",
+      "type": "text",
+      "text": "**FastAPI**\n待学习",
+      "x": 680,
+      "y": 1400,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t9",
+      "type": "text",
+      "text": "**JWT**\n待学习",
+      "x": 680,
+      "y": 1580,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "t10",
+      "type": "text",
+      "text": "**Kafka**\n待学习",
+      "x": 680,
+      "y": 1760,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k1",
+      "type": "text",
+      "text": "缓存",
+      "x": 1040,
+      "y": 140,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k2",
+      "type": "text",
+      "text": "Key 设计",
+      "x": 1040,
+      "y": 320,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k3",
+      "type": "text",
+      "text": "过期策略",
+      "x": 1040,
+      "y": 500,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k4",
+      "type": "text",
+      "text": "缓存穿透/击穿/雪崩",
+      "x": 1040,
+      "y": 680,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k5",
+      "type": "text",
+      "text": "表设计",
+      "x": 1040,
+      "y": 860,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k6",
+      "type": "text",
+      "text": "索引",
+      "x": 1040,
+      "y": 1040,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k7",
+      "type": "text",
+      "text": "SQL 优化",
+      "x": 1040,
+      "y": 1220,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k8",
+      "type": "text",
+      "text": "事务",
+      "x": 1040,
+      "y": 1400,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k9",
+      "type": "text",
+      "text": "资源设计",
+      "x": 1040,
+      "y": 1580,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k10",
+      "type": "text",
+      "text": "HTTP 语义",
+      "x": 1040,
+      "y": 1760,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k11",
+      "type": "text",
+      "text": "状态码",
+      "x": 1040,
+      "y": 1940,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k12",
+      "type": "text",
+      "text": "分页",
+      "x": 1040,
+      "y": 2120,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k13",
+      "type": "text",
+      "text": "IoC/DI",
+      "x": 1040,
+      "y": 2300,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k14",
+      "type": "text",
+      "text": "AOP",
+      "x": 1040,
+      "y": 2480,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k15",
+      "type": "text",
+      "text": "Bean 生命周期",
+      "x": 1040,
+      "y": 2660,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k16",
+      "type": "text",
+      "text": "事务管理",
+      "x": 1040,
+      "y": 2840,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k17",
+      "type": "text",
+      "text": "组件",
+      "x": 1040,
+      "y": 3020,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k18",
+      "type": "text",
+      "text": "Hooks",
+      "x": 1040,
+      "y": 3200,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k19",
+      "type": "text",
+      "text": "虚拟 DOM",
+      "x": 1040,
+      "y": 3380,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "k20",
+      "type": "text",
+      "text": "状态管理",
+      "x": 1040,
+      "y": 3560,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "x1",
+      "type": "text",
+      "text": "**REST API**\n学习资源设计基础",
+      "x": 1400,
+      "y": 140,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "x2",
+      "type": "text",
+      "text": "**React**\n学习组件基础",
+      "x": 1400,
+      "y": 320,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "x3",
+      "type": "text",
+      "text": "**Spring**\n学习IoC/DI基础",
+      "x": 1400,
+      "y": 500,
+      "width": 260,
+      "height": 80,
+      "color": "1"
+    },
+    {
+      "id": "x4",
+      "type": "text",
+      "text": "**MySQL**\n学习表设计基础",
+      "x": 1400,
+      "y": 680,
+      "width": 260,
+      "height": 80,
+      "color": "2"
+    },
+    {
+      "id": "x5",
+      "type": "text",
+      "text": "**Django**\n学习MTV 架构基础",
+      "x": 1400,
+      "y": 860,
+      "width": 260,
+      "height": 80,
+      "color": "2"
+    },
+    {
+      "id": "x6",
+      "type": "text",
+      "text": "**Elasticsearch**\n学习倒排索引基础",
+      "x": 1400,
+      "y": 1040,
+      "width": 260,
+      "height": 80,
+      "color": "2"
+    },
+    {
+      "id": "x7",
+      "type": "text",
+      "text": "**FastAPI**\n学习路由基础",
+      "x": 1400,
+      "y": 1220,
+      "width": 260,
+      "height": 80,
+      "color": "2"
+    },
+    {
+      "id": "x8",
+      "type": "text",
+      "text": "**JWT**\n学习令牌结构基础",
+      "x": 1400,
+      "y": 1400,
+      "width": 260,
+      "height": 80,
+      "color": "2"
+    },
+    {
+      "id": "x9",
+      "type": "text",
+      "text": "**Kafka**\n学习生产者/消费者基础",
+      "x": 1400,
+      "y": 1580,
+      "width": 260,
+      "height": 80,
+      "color": "2"
+    },
+    {
+      "id": "x10",
+      "type": "text",
+      "text": "**MongoDB**\n学习文档模型基础",
+      "x": 1400,
+      "y": 1760,
+      "width": 260,
+      "height": 80,
+      "color": "2"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-do1",
+      "fromNode": "hub",
+      "toNode": "c1",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-do2",
+      "fromNode": "hub",
+      "toNode": "c2",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-do3",
+      "fromNode": "hub",
+      "toNode": "c3",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t1",
+      "fromNode": "hub",
+      "toNode": "t1",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t2",
+      "fromNode": "hub",
+      "toNode": "t2",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t3",
+      "fromNode": "hub",
+      "toNode": "t3",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t4",
+      "fromNode": "hub",
+      "toNode": "t4",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t5",
+      "fromNode": "hub",
+      "toNode": "t5",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t6",
+      "fromNode": "hub",
+      "toNode": "t6",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t7",
+      "fromNode": "hub",
+      "toNode": "t7",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t8",
+      "fromNode": "hub",
+      "toNode": "t8",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t9",
+      "fromNode": "hub",
+      "toNode": "t9",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-t10",
+      "fromNode": "hub",
+      "toNode": "t10",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k1",
+      "fromNode": "t1",
+      "toNode": "k1",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k2",
+      "fromNode": "t1",
+      "toNode": "k2",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k3",
+      "fromNode": "t1",
+      "toNode": "k3",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k4",
+      "fromNode": "t1",
+      "toNode": "k4",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k5",
+      "fromNode": "t2",
+      "toNode": "k5",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k6",
+      "fromNode": "t2",
+      "toNode": "k6",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k7",
+      "fromNode": "t2",
+      "toNode": "k7",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k8",
+      "fromNode": "t2",
+      "toNode": "k8",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k9",
+      "fromNode": "t3",
+      "toNode": "k9",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k10",
+      "fromNode": "t3",
+      "toNode": "k10",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k11",
+      "fromNode": "t3",
+      "toNode": "k11",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k12",
+      "fromNode": "t3",
+      "toNode": "k12",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k13",
+      "fromNode": "t4",
+      "toNode": "k13",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k14",
+      "fromNode": "t4",
+      "toNode": "k14",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k15",
+      "fromNode": "t4",
+      "toNode": "k15",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k16",
+      "fromNode": "t4",
+      "toNode": "k16",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k17",
+      "fromNode": "t5",
+      "toNode": "k17",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k18",
+      "fromNode": "t5",
+      "toNode": "k18",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k19",
+      "fromNode": "t5",
+      "toNode": "k19",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-k20",
+      "fromNode": "t5",
+      "toNode": "k20",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x1",
+      "fromNode": "t3",
+      "toNode": "x1",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x2",
+      "fromNode": "t5",
+      "toNode": "x2",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x3",
+      "fromNode": "t4",
+      "toNode": "x3",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x4",
+      "fromNode": "t2",
+      "toNode": "x4",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x5",
+      "fromNode": "t6",
+      "toNode": "x5",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x6",
+      "fromNode": "t7",
+      "toNode": "x6",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x7",
+      "fromNode": "t8",
+      "toNode": "x7",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x8",
+      "fromNode": "t9",
+      "toNode": "x8",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x9",
+      "fromNode": "t10",
+      "toNode": "x9",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    },
+    {
+      "id": "e-x10",
+      "fromNode": "hub",
+      "toNode": "x10",
+      "fromSide": "right",
+      "toSide": "left",
+      "color": "2"
+    }
+  ]
+}

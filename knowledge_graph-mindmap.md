@@ -107,6 +107,8 @@ mindmap
       tests/test_coach.py
       tests/test_event_bridge.py
       tests/test_knowledge.py
+      tests/test_learning_canvas.py
+      tests/test_learning_report.py
       tests/test_report_route.py
       Key 设计
       缓存
