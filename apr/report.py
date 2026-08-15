@@ -1,10 +1,11 @@
-"""报告渲染：8 大板块 + 技能评估 + 附录。"""
+"""报告渲染：8 大板块 + 技能评估 + 学习路线 + 附录。"""
 from __future__ import annotations
 
 from . import __version__
 from .analyzer import ReviewResult
 from .assessment.blindspot import detect_blind_spots
 from .assessment.skill import LEVEL_LABELS, SkillAssessment, assess_skills
+from .coach.planner import LearningPlan, build_learning_plan
 
 
 def _render_skill_section(assessment: SkillAssessment) -> str:
@@ -40,6 +41,38 @@ def _render_skill_section(assessment: SkillAssessment) -> str:
     return "\n".join(lines)
 
 
+def _render_route_section(plan: LearningPlan, assessment: SkillAssessment) -> str:
+    """「下一阶段学习路线」章节：当前不足 → 原因 → 学习任务 → 实践项目。"""
+    lines = ["## 下一阶段学习路线", "",
+             "> 由 Learning Coach 基于五类数据生成：技能评估 × 知识图谱 × Quiz × 技术栈 × AI 贡献。",
+             ""]
+    if not plan.priority:
+        lines += ["暂无足够数据生成学习路线。建议：", "",
+                  "- 填写 profile.yaml 技能档案", "- 运行 apr quiz 完成实践验证", ""]
+        return "\n".join(lines)
+    for item in plan.priority:
+        reasons = list(item.reason)
+        entry = assessment.entries.get(item.skill)
+        if entry is not None:
+            level = entry.claimed_level or entry.final_level
+            level_line = "用户技能等级 " + (LEVEL_LABELS.get(level, level) if level else "未评估")
+            if level_line not in reasons:
+                reasons.append(level_line)
+        lines += ["### " + item.skill, "", "**原因**："]
+        for r in reasons:
+            lines.append("- " + r)
+        lines += ["", "**学习路线**："]
+        for i, a in enumerate(item.action, 1):
+            lines.append(str(i) + ". " + a)
+        lines.append("")
+    if plan.next_projects:
+        lines += ["**实践项目**："]
+        for p in plan.next_projects:
+            lines.append("- " + p)
+        lines.append("")
+    return "\n".join(lines)
+
+
 def render_report(result: ReviewResult) -> str:
     cfg = result.config
     name = result.project.name
@@ -57,9 +90,10 @@ def render_report(result: ReviewResult) -> str:
         meta.append(f"{i}. [{title}](#{title})")
     n = len(result.sections)
     meta.append(f"{n + 1}. [我的技能评估](#我的技能评估)")
-    meta.append(f"{n + 2}. [附录 A：AI 生成证据明细](#附录-aai-生成证据明细)")
+    meta.append(f"{n + 2}. [下一阶段学习路线](#下一阶段学习路线)")
+    meta.append(f"{n + 3}. [附录 A：AI 生成证据明细](#附录-aai-生成证据明细)")
     if result.quiz:
-        meta.append(f"{n + 3}. [附录 B：实践验证记录](#附录-b实践验证记录)")
+        meta.append(f"{n + 4}. [附录 B：实践验证记录](#附录-b实践验证记录)")
     # 学习盲区：由证据引擎计算，替换 LLM 生成的占位内容
     blind_spots = detect_blind_spots(profile=result.profile, scan=result.scan,
                                      digest=result.digest, quiz=result.quiz,
@@ -71,6 +105,13 @@ def render_report(result: ReviewResult) -> str:
         body += ["", "---", ""]
     skill_assessment = assess_skills(result.profile, result.scan, result.quiz, result.evidence)
     body.append(_render_skill_section(skill_assessment))
+    body += ["", "---", ""]
+    learning_plan = build_learning_plan(profile=result.profile, scan=result.scan,
+                                        digest=result.digest, quiz=result.quiz,
+                                        evidence=result.evidence,
+                                        assessment=skill_assessment,
+                                        blind_spots=blind_spots)
+    body.append(_render_route_section(learning_plan, skill_assessment))
     body += ["", "---", ""]
     appendix = ["## 附录 A：AI 生成证据明细", ""]
     if result.evidence.items:

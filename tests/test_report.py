@@ -66,7 +66,8 @@ class ReportSkillSectionTest(unittest.TestCase):
         self.assertIn("## 附录 A：AI 生成证据明细", text)
         self.assertLess(text.find("## 我的技能评估"), text.find("## 附录 A"))
         self.assertIn("9. [我的技能评估](#我的技能评估)", text)
-        self.assertIn("10. [附录 A：AI 生成证据明细]", text)
+        self.assertIn("10. [下一阶段学习路线](#下一阶段学习路线)", text)
+        self.assertIn("11. [附录 A：AI 生成证据明细]", text)
         self.assertIn("1. [项目介绍](#项目介绍)", text)
         self.assertIn("8. [下一步练习](#下一步练习)", text)
 
