@@ -89,6 +89,7 @@
 
     apr review <项目路径>        # 生成复盘报告（默认 README复盘.md）
     apr scan <项目路径>          # 只扫描并预览技术栈，不调用 LLM
+    apr graph <项目路径>         # 生成知识图谱 knowledge_graph.json（代码→技术→知识点→技能）
     apr quiz <项目路径>          # 只运行实践验证问答
     apr init <项目路径>          # 生成 apr.yaml 与 profile.yaml 模板
     apr web                      # 启动 Web 界面（http://127.0.0.1:8765）
